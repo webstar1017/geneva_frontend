@@ -18,6 +18,11 @@ import MarkdownRenderer from "./MarkdownRenderer";
 import { useFingerprint } from "./FingerPrint";
 
 export default function LLMAggregator() {
+  const themes = [
+      "dark",
+      "light",
+      "image"
+  ];
   const fingerprint = useFingerprint();
   const router = useRouter();
   const { theme, setTheme } = useTheme()
@@ -27,15 +32,22 @@ export default function LLMAggregator() {
   const [filterList, setFilterList] = useState([]);
   const [chatList, setChatList] = useState([]);
   const [hideSideBar, setHideSideBar] = useState(true);
-
+  const abortControllerRef = useRef(null);
   const waitingRef = useRef(null);
   const inputRef = useRef(null);
+
   // Function to handle the auto resizing of the textarea
   const handleInputChange = (e) => {
     setQuery(e.target.value);
     const textarea = e.target;
     textarea.style.height = 'auto'; // Reset height before recalculating
     textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
+  };
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort(); // Cancel the ongoing fetch
+    }
   };
 
   const askQuestion = () => {
@@ -47,6 +59,10 @@ export default function LLMAggregator() {
     textarea.style.height = 'auto';        // Reset height
     textarea.style.height = '44px';
     setWaitingAnswer(true);
+
+    abortControllerRef.current = new AbortController();
+    const { signal } = abortControllerRef.current;
+
     if(!chat_id) chat_id = Math.floor(Date.now() / 1000);
     setChatHistory((prevList) => [...prevList, {type: 'question', chat_id: chat_id, text: question, level: 'question'}]);
     setFilterList((prevList) => [...prevList, {type: 'question', chat_id: chat_id, text: question, level: 'question'}]);
@@ -55,6 +71,7 @@ export default function LLMAggregator() {
       headers: {
           'Content-Type': 'application/json',
       },
+      signal: signal,
       body: JSON.stringify({user_id: fingerprint, chat_id: chat_id, question: question, history: history})
     }).then((response) => {
       if (!response.ok) {
@@ -98,7 +115,9 @@ export default function LLMAggregator() {
   };
 
   const changeTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
+    // setTheme(theme === 'dark' ? 'light' : 'dark')
+    const themeIndex = themes.findIndex(item => item === theme);
+    setTheme(themes((themeIndex + 1) % 3));
   }
   
   const loadChatHistory = async() => {
@@ -409,6 +428,7 @@ export default function LLMAggregator() {
                   <div className="flex w-full flex-col gap-1 empty:hidden items-end rtl:items-start">
                     <div className="relative max-w-[var(--user-chat-width,70%)] rounded-3xl py-2.5 text-2xl">
                       {item.text}
+                      <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
                     </div>
                   </div>
                 </div>
@@ -678,6 +698,16 @@ export default function LLMAggregator() {
                   <span className="text-3xl my-15">We intelligently unify AIs to give you high-quality, trusted answers & smarter discovery</span>
                 </div>
             )}
+            <div>
+              {
+                waitingAnswer &&
+                  <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                       onClick={() => {
+                         handleCancel()
+                       }}
+                  />
+              }
+            </div>
             <div className="flex w-full pb-2 cursor-text flex-col items-center justify-center rounded-[20px] border border-[#F1E2FA] contain-inline-size overflow-clip bg-white dark:bg-black shadow-[10px_1px_20px_1px_black]">
               <Textarea
                 ref={inputRef}
