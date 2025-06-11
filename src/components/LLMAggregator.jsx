@@ -38,6 +38,7 @@ export default function LLMAggregator() {
   const inputRef = useRef(null);
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
+  const scrollRef = useRef(null);
 
   // Function to handle the auto resizing of the textarea
   const handleInputChange = (e) => {
@@ -348,8 +349,26 @@ export default function LLMAggregator() {
           <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={addNewChatId}/>
           <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" onClick={addNewChatId}/>
           <div className="flex justify-between w-[80%]">
-            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"/>
-            <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"/>
+            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
+                 onClick={() => {
+                   if (scrollRef.current) {
+                     scrollRef.current.scrollTo({
+                       top: 0,
+                       behavior: 'smooth',
+                     });
+                   }
+                 }}
+            />
+            <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"
+                 onClick={() => {
+                   if (scrollRef.current) {
+                     scrollRef.current.scrollTo({
+                       top: scrollRef.current.scrollHeight,
+                       behavior: 'smooth',
+                     });
+                   }
+                 }}
+            />
           </div>
           <div className="w-[100%]" align="center">
             <input
@@ -365,7 +384,7 @@ export default function LLMAggregator() {
             </div>
           </div>
         </div>
-        <div className="w-full px-4 gap-2 flex flex-col overflow-y-auto">
+        <div className="w-full px-4 gap-2 flex flex-col overflow-y-auto" ref={scrollRef}>
           {chatList.filter((item) => item.text.indexOf(search) > -1).map((item, index) => {
             return (
               <div key={index} className="relative group w-full">

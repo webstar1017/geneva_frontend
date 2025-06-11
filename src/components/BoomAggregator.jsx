@@ -32,6 +32,8 @@ export default function BoomAggregator() {
   const [category, setCategory] = useState('random');
   const [icon, setIcon] = useState(false);
   const [hideSideBar, setHideSideBar] = useState(true);
+  const [search, setSearch] = useState("");
+  const scrollRef = useRef(null);
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
@@ -293,9 +295,47 @@ export default function BoomAggregator() {
           </div>
           <img src="/image/x.svg" alt="x" className="w-[24] cursor-pointer" />
           <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={searchNew}/>
+          <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" />
+          <div className="flex justify-between w-[80%]">
+            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
+              onClick={() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                  });
+                }
+              }}
+            />
+            <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"
+              onClick={() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollTo({
+                    top: scrollRef.current.scrollHeight,
+                    behavior: 'smooth',
+                  });
+                }
+              }}
+            />
+          </div>
+          <div className="w-[100%]" align="center">
+            <input
+                className="border border-gray w-[80%] m-auto pl-6 pr-2"
+                placeholder="Search..."
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                }}
+            />
+            <div className="relative">
+              <img src="/image/search.png" width={15} style={{position: "absolute", left: "35px", top: " -20px"}}/>
+            </div>
+          </div>
         </div>
-        <div className="w-full px-4 gap-2 flex flex-col overflow-y-auto">
-          {Array.isArray(productHistory) && productHistory.map((item, index) => {
+        <div className="w-full px-4 gap-2 flex flex-col overflow-y-auto"
+          ref={scrollRef}
+        >
+          {Array.isArray(productHistory) && productHistory.filter((item) => item.query.indexOf(search) > -1).map((item, index) => {
             return (
               <div key={index} className="relative group w-full">
                 <Button
