@@ -16,6 +16,7 @@ import {
 import toast from 'react-hot-toast';
 import MarkdownRenderer from "./MarkdownRenderer";
 import { useFingerprint } from "./FingerPrint";
+import useIsMobile from "@/components/useIsMobile";
 
 export default function LLMAggregator() {
   const themes = [
@@ -35,6 +36,8 @@ export default function LLMAggregator() {
   const abortControllerRef = useRef(null);
   const waitingRef = useRef(null);
   const inputRef = useRef(null);
+  const isMobile = useIsMobile();
+  const [search, setSearch] = useState("");
 
   // Function to handle the auto resizing of the textarea
   const handleInputChange = (e) => {
@@ -117,7 +120,7 @@ export default function LLMAggregator() {
   const changeTheme = () => {
     // setTheme(theme === 'dark' ? 'light' : 'dark')
     const themeIndex = themes.findIndex(item => item === theme);
-    setTheme(themes((themeIndex + 1) % 3));
+    setTheme(themes[(themeIndex + 1) % 3]);
   }
   
   const loadChatHistory = async() => {
@@ -343,9 +346,27 @@ export default function LLMAggregator() {
           </div>
           <img src="/image/x.svg" alt="x" className="w-[24] cursor-pointer" />
           <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={addNewChatId}/>
+          <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" onClick={addNewChatId}/>
+          <div className="flex justify-between w-[80%]">
+            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"/>
+            <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"/>
+          </div>
+          <div className="w-[100%]" align="center">
+            <input
+                className="border border-gray w-[80%] m-auto pl-6 pr-2"
+                placeholder="Search..."
+                value={search}
+                onChange={(event) => {
+                    setSearch(event.target.value);
+                }}
+            />
+            <div className="relative">
+              <img src="/image/search.png" width={15} style={{position: "absolute", left: "35px", top: " -20px"}}/>
+            </div>
+          </div>
         </div>
         <div className="w-full px-4 gap-2 flex flex-col overflow-y-auto">
-          {chatList.map((item, index) => {
+          {chatList.filter((item) => item.text.indexOf(search) > -1).map((item, index) => {
             return (
               <div key={index} className="relative group w-full">
                 <Button
@@ -365,7 +386,8 @@ export default function LLMAggregator() {
                       className="absolute w-[14px] right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
                     />
                   </DialogTrigger>
-                  <DialogContent className="bg-[url('/image/background-light.png')] dark:bg-[url('/image/background-dark.png')] bg-[length:100%_100%] bg-no-repeat bg-center border-none shadow-[10px_1px_20px_1px_black] px-0 rounded-4xl [&>button]:hidden font-goudy text-xl ring-0">
+                  <DialogContent
+                      className="bg-[length:100%_100%] bg-no-repeat bg-center border-none shadow-[10px_1px_20px_1px_black] px-0 rounded-4xl [&>button]:hidden font-goudy text-xl ring-0">
                     <DialogHeader className="items-center">
                       <DialogTitle className="text-xl">delete chat?</DialogTitle>
                       <hr className="mt-4 !border-[#D4F8E5] w-full"/>
@@ -393,10 +415,12 @@ export default function LLMAggregator() {
         </div>
       </div>
       <div
+        style={{
+          background: `url(/image/background-${theme}${isMobile ? "-mobile" : ""}.png)`,
+        }}
         className={`
+          background-image
           flex-1 flex flex-col
-          bg-[url('/image/background-light.png')] dark:bg-[url('/image/background-dark.png')]
-          bg-[length:100%_100%] bg-no-repeat bg-center
           transition-all duration-300 ease-in-out
           ${hideSideBar ? 'ml-0' : 'ml-0 sm:ml-[300px]'}
         `}
@@ -692,23 +716,22 @@ export default function LLMAggregator() {
         </div>
         <div className={`flex mx-auto px-3 md:px-4 w-full pb-6 ${filterList.length ? '' : 'flex-1'}`}>
           <div className="mx-auto flex flex-col flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl xl:max-w-[48rem] justify-center items-center">
+            {
+                waitingAnswer &&
+                <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                     onClick={() => {
+                       handleCancel()
+                     }}
+                />
+            }
             {!filterList.length && (
                 <div className="flex flex-col items-center">
                   <span className="text-[60px]">Welcome to Geneva</span>
                   <span className="text-3xl my-15">We intelligently unify AIs to give you high-quality, trusted answers & smarter discovery</span>
                 </div>
             )}
-            <div>
-              {
-                waitingAnswer &&
-                  <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                       onClick={() => {
-                         handleCancel()
-                       }}
-                  />
-              }
-            </div>
             <div className="flex w-full pb-2 cursor-text flex-col items-center justify-center rounded-[20px] border border-[#F1E2FA] contain-inline-size overflow-clip bg-white dark:bg-black shadow-[10px_1px_20px_1px_black]">
+
               <Textarea
                 ref={inputRef}
                 className="resize-none max-h-48 overflow-auto !border-none focus-visible:ring-0 !shadow-none ml-2 !min-h-8 bg-white dark:bg-black !text-xl"

@@ -36,7 +36,7 @@ export default function BoomAggregator() {
   const handleInputChange = (e) => {
     setQuery(e.target.value);
     let space = 30;
-    if(e.target.value == '') space += 35;
+    if(e.target.value == '') space += 15;
     const coords = getCaretCoordinates(e.target, 0);
     setIconOffset(coords.left - space); // `left` is x-coordinate of caret
   };
@@ -386,12 +386,13 @@ export default function BoomAggregator() {
             </div>
           </div>
         </div>
-        <div className="mx-auto flex gap-4 md:gap-8 lg:gap-20 md:max-w-3xl xl:max-w-[48rem] justify-center items-center text-2xl my-10">
-          <span className={`${category == 'footwear' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('footwear')}>footwear</span>
-          <span className={`${category == 'beauty' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('beauty')}>beauty</span>
-          <span className={`${category == 'clothing' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('clothing')}>clothing</span>
-          <span className={`${category == 'furniture' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('furniture')}>furniture</span>
-          <span className={`${category == 'electronics' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('electronics')}>electronics</span>
+        <div className=" w-[90%] m-auto flex  justify-center md:justify-between lg:justify-between items-center text-2xl my-10" style={{flexWrap: "wrap", gap: "50px"}}>
+          <div className={`${category == 'footwear' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('footwear')}>footwear</div>
+          <div className={`${category == 'beauty' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('beauty')}>beauty</div>
+          <div className={`${category == 'clothing' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('clothing')}>clothing</div>
+          <div className={`${category == 'furniture' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('furniture')}>furniture</div>
+          <div className={`${category == 'electronics' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('electronics')}>electronics</div>
+          <div className={`${category == 'random' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('random')}>&  everything else</div>
         </div>
         {waitingAnswer && 
           <div className="flex flex-col flex-1 my-4">

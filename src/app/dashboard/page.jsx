@@ -26,7 +26,6 @@ const Dashboard = () => {
         router.push("/login");
       }
     };
-
     auth();
   }, [fingerprint])
   return (
