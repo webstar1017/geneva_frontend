@@ -48,10 +48,10 @@ export default function LLMAggregator() {
     textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
   };
 
-  const handleCancel = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort(); // Cancel the ongoing fetch
-    }
+  const handleCancel = (index) => {
+    const filter_list = JSON.parse(JSON.stringify(filterList));
+    filter_list[index]["close"] = true;
+    setFilterList((filter_list));
   };
 
   const askQuestion = () => {
@@ -86,6 +86,8 @@ export default function LLMAggregator() {
       if(response.level.includes('product')) {
         if(response.level == 'compare_product') {
           const final_answer = JSON.parse(response.answer);
+          console.log(final_answer);
+          console.log(final_answer);
           setChatHistory((prevList) => [...prevList, {user_id: fingerprint, type: response.level, chat_id: chat_id, text: final_answer['answer'], level: response.level, status_report: response.status_report, opinion: response.opinion, product: final_answer['products']}]);
           setFilterList((prevList) => [...prevList, {user_id: fingerprint, type: response.level, chat_id: chat_id, text: final_answer['answer'], level: response.level, status_report: response.status_report, opinion: response.opinion, product: final_answer['products'], verify_top_open: false, verify_bottom_open: false}]);
         } else {
@@ -322,19 +324,17 @@ export default function LLMAggregator() {
           onClick={() => setHideSideBar(true)}
         />
       )}
-
       {/* Sidebar */}
-      
-        <div
+        <div ref={scrollRef}
           className={`
             fixed top-0 left-0 z-50
-            w-[300px] h-full flex flex-col items-center py-4 gap-3
+            w-[300px] h-full py-4 gap-3
             !bg-white !text-black
             transform transition-transform duration-300 ease-in-out
             ${hideSideBar ? '-translate-x-full' : 'translate-x-0'}
           `}
         >
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 overflow-y-auto">
           <div className="absolute top-0 right-0 px-2 pt-3 cursor-pointer" onClick={() => setHideSideBar(true)}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30]">
               <path d="M13 19L7 12L13 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
@@ -384,7 +384,7 @@ export default function LLMAggregator() {
             </div>
           </div>
         </div>
-        <div className="w-full px-4 gap-2 flex flex-col overflow-y-auto" ref={scrollRef}>
+        <div className="w-full px-4 gap-2 flex flex-col mt-5" >
           {chatList.filter((item) => item.text.indexOf(search) > -1).map((item, index) => {
             return (
               <div key={index} className="relative group w-full">
@@ -446,13 +446,17 @@ export default function LLMAggregator() {
       >
         <header className="flex justify-between items-center px-8 py-2">
           <div className="flex gap-3">
-            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30] self-start mt-1 cursor-pointer" onClick={() => setHideSideBar(false)}>
+            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                 style={{color: theme === "light" ? "black" : "white"}}
+                                 className="w-[30] self-start mt-1 cursor-pointer" onClick={() => setHideSideBar(false)}>
               <path d="M20 7L4 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
               <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
               <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
             </svg>}
             <div className="flex flex-col gap-4">
-              <p className="underline decoration-[#D4F8E5] decoration-2 underline-offset-[10px] text-2xl cursor-pointer" onClick={() => router.push('/marketplace')}>marketplace</p>
+              <p className="underline decoration-[#D4F8E5] decoration-2 underline-offset-[10px] text-2xl cursor-pointer"
+                 style={{color: theme === "light" ? "black" : "white"}}
+                 onClick={() => router.push('/marketplace')}>marketplace</p>
               <img src="/image/boom.png" alt="x" className="w-[20] self-end cursor-pointer" onClick={() => router.push('/marketplace')}/>
             </div>
           </div>
@@ -469,7 +473,9 @@ export default function LLMAggregator() {
               <div key={index} className="mx-auto flex flex-1 gap-4 md:max-w-3xl">
                 <div className="w-full px-4 py-4">
                   <div className="flex w-full flex-col gap-1 empty:hidden items-end rtl:items-start">
-                    <div className="relative max-w-[var(--user-chat-width,70%)] rounded-3xl py-2.5 text-2xl">
+                    <div className="relative max-w-[var(--user-chat-width,70%)] rounded-3xl py-2.5 text-2xl"
+                      style={{color: theme === "light" ? "black" : "white"}}
+                    >
                       {item.text}
                       <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
                     </div>
@@ -481,7 +487,9 @@ export default function LLMAggregator() {
                 {<div className="flex flex-col mx-4 dark:text-white text-xl my-6">
                   <div className="flex items-center gap-2 mt-6">
                     <img src="/image/verify.png" alt="verify" className="w-[20]"/>
-                    <span className="font-semibold">Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.level == 'Easy' ? 3 : item.level == 'Medium' ? 5 : 7} models</span>
+                    <span className="font-semibold"
+                          style={{color: theme === "light" ? "black" : "white"}}
+                    >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.level == 'Easy' ? 3 : item.level == 'Medium' ? 5 : 7} models</span>
                     <img src="/image/down.png" alt="down" className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_top_open ? 'rotate-x-180' : ''}`} onClick={() => setVerifyOpen(index, 'top')}/>
                     <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
                   </div>
@@ -501,13 +509,17 @@ export default function LLMAggregator() {
                     <MarkdownRenderer content={item.opinion} />
                   </span>}
                 </div>}
-                <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                  <MarkdownRenderer content={item.text} />
-                </div>
+                {
+                  !item.close && <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
+                    <MarkdownRenderer content={item.text} />
+                  </div>
+                }
                 {<div className="flex flex-col mx-4 dark:text-white text-xl">
                   <div className="flex items-center gap-2 mt-6">
                     <img src="/image/verify.png" alt="verify" className="w-[20]"/>
-                    <span className="font-semibold">Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.level == 'Easy' ? 3 : item.level == 'Medium' ? 5 : 7} models</span>
+                    <span className="font-semibold"
+                          style={{color: theme === "light" ? "black" : "white"}}
+                    >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.level == 'Easy' ? 3 : item.level == 'Medium' ? 5 : 7} models</span>
                     <img src="/image/down.png" alt="down" className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_bottom_open ? 'rotate-x-180' : ''}`} onClick={() => setVerifyOpen(index, 'bottom')}/>
                     <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
                   </div>
@@ -527,6 +539,16 @@ export default function LLMAggregator() {
                     <MarkdownRenderer content={item.opinion} />
                   </span>}
                 </div>}
+                <div align="center">
+                  {
+                    !item.close &&
+                      <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                           onClick={() => {
+                             handleCancel(index)
+                           }}
+                      />
+                  }
+                </div>
               </div>
             )} else if(item.type == 'compare_product') { return (
               <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
@@ -553,35 +575,38 @@ export default function LLMAggregator() {
                     <MarkdownRenderer content={item.opinion} />
                   </span>}
                 </div>}
-                <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                  <MarkdownRenderer content={item.text}/>
-                  <div className="text-2xl">Here {item.product.length > 1 ? 'are the products' : 'is the product'}:</div>
-                  <div className="w-full px-4 py-4 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 justify-items-center">
-                  {item.product.map((product, id) => {
-                    return (
-                      <div
-                        key={id}
-                        className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
-                        onClick={() => linkToProduct(product.url)}
-                      >
-                        <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.title}</div>
-                        <div className="flex justify-center w-full">
-                          <img
-                            src={product.image}
-                            alt="product"
-                            className="max-w-[200px] max-h-[200px] pt-3"
-                          />
-                        </div>
-                        <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
+                {
+                    !item.close && <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
+                      <MarkdownRenderer content={item.text}/>
+                      <div className="text-2xl">Here {item.product.length > 1 ? 'are the products' : 'is the product'}:</div>
+                      <div className="w-full px-4 py-4 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 justify-items-center">
+                        {item.product.map((product, id) => {
+                          return (
+                              <div
+                                  key={id}
+                                  className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
+                                  onClick={() => linkToProduct(product.url)}
+                              >
+                                <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.title}</div>
+                                  <ProductSlider
+                                    data={{
+                                      main: product.image,
+                                      thumbnails: product.thumbnails
+                                    }}
+                                  />
+                                <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
+                              </div>
+                          )})
+                        }
                       </div>
-                    )})
-                  }
-                  </div>
-                </div>
+                    </div>
+                }
                 {<div className="flex flex-col mx-4 dark:text-white text-xl">
                   <div className="flex items-center gap-2 mt-6">
                     <img src="/image/verify.png" alt="verify" className="w-[20]"/>
-                    <span className="font-semibold">Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.status_report.length} models</span>
+                    <span className="font-semibold"
+                          style={{color: theme === "light" ? "black" : "white"}}
+                    >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.status_report.length} models</span>
                     <img src="/image/down.png" alt="down" className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_bottom_open ? 'rotate-x-180' : ''}`} onClick={() => setVerifyOpen(index, 'bottom')}/>
                     <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
                   </div>
@@ -601,6 +626,16 @@ export default function LLMAggregator() {
                     <MarkdownRenderer content={item.opinion} />
                   </span>}
                 </div>}
+                <div align="center">
+                  {
+                      !item.close &&
+                      <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                           onClick={() => {
+                             handleCancel(index)
+                           }}
+                      />
+                  }
+                </div>
               </div>
             )} else if(item.type == "general_product") {
               return (
@@ -631,9 +666,19 @@ export default function LLMAggregator() {
                   <div className="px-8 text-2xl mt-4 dark:text-white">
                     You can also browse & shop from the Boom Marketplace <a link='#' className="underline cursor-pointer" onClick={() => router.push('/marketplace')}>here</a>
                   </div>
+                  <div align="center">
+                    {
+                        !item.close &&
+                        <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                             onClick={() => {
+                               handleCancel(index)
+                             }}
+                        />
+                    }
+                  </div>
                 </div>
               )
-            } else {              
+            } else {
               return (
                 <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
                   <div className="px-8 text-2xl mb-4 dark:text-white">
@@ -646,18 +691,16 @@ export default function LLMAggregator() {
                         className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
                         onClick={() => linkToProduct(item.product[0].url)}
                       >
-                        <div className="flex justify-center w-full">
-                          <img
-                            src={item.product[0].image}
-                            alt="product"
-                            className="max-w-[200px] max-h-[200px] pt-3"
+                          <ProductSlider
+                              data={{
+                                main: product[0].image,
+                                thumbnails: product.thumbnails
+                              }}
                           />
-                        </div>
                         <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{item.product[0].price}</div>
                       </div>
                     </div>
                   )}
-
                   <div className="px-8 text-2xl mb-4 dark:text-white">
                     And here are alternatives to choose from:
                   </div>
@@ -685,20 +728,32 @@ export default function LLMAggregator() {
                   <div className="px-8 text-2xl mt-4 dark:text-white">
                     You can also browse & shop from the Boom Marketplace <a link='#' className="underline cursor-pointer" onClick={() => router.push('/marketplace')}>here</a>
                   </div>
+                  <div align="center">
+                    {
+                        !item.close &&
+                        <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                             onClick={() => {
+                               handleCancel(index)
+                             }}
+                        />
+                    }
+                  </div>
                 </div>
               )
             }
           })}
+
           {waitingAnswer && <div ref={waitingRef} className="mx-auto flex flex-col flex-1 md:max-w-3xl my-4">
             <div className="mx-4 py-4 flex text-2xl">
               <img src="/image/logo.png" alt="logo" className="w-[30] mr-2" />
-              Consulting the council
-              <span className="ml-2 flex">
-                <span className="dot dot1">.</span>
-                <span className="dot dot2">.</span>
-                <span className="dot dot3">.</span>
+              <span style={{color: theme === "light" ? "dark" : "white"}}>
+                Consulting the council
               </span>
-
+              <span className="ml-2 flex">
+                <span className="dot dot1" style={{color: theme === "light" ? "dark" : "white"}}>.</span>
+                <span className="dot dot2" style={{color: theme === "light" ? "dark" : "white"}}>.</span>
+                <span className="dot dot3" style={{color: theme === "light" ? "dark" : "white"}}>.</span>
+              </span>
               <style jsx>{`
                 .dot {
                   animation: bounce 1.5s infinite;
@@ -732,28 +787,25 @@ export default function LLMAggregator() {
               `}</style>
             </div>
           </div>}
+
         </div>
         <div className={`flex mx-auto px-3 md:px-4 w-full pb-6 ${filterList.length ? '' : 'flex-1'}`}>
           <div className="mx-auto flex flex-col flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl xl:max-w-[48rem] justify-center items-center">
-            {
-                waitingAnswer &&
-                <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                     onClick={() => {
-                       handleCancel()
-                     }}
-                />
-            }
             {!filterList.length && (
                 <div className="flex flex-col items-center">
-                  <span className="text-[60px]">Welcome to Geneva</span>
-                  <span className="text-3xl my-15">We intelligently unify AIs to give you high-quality, trusted answers & smarter discovery</span>
+                  <span className="text-[60px]"
+                        style={{color: theme === "light" ? "black" : "white"}}
+                  >Welcome to Geneva</span>
+                  <span className="text-3xl my-15"
+                        style={{color: theme === "light" ? "black" : "white"}}
+                  >We intelligently unify AIs to give you high-quality, trusted answers & smarter discovery</span>
                 </div>
             )}
             <div className="flex w-full pb-2 cursor-text flex-col items-center justify-center rounded-[20px] border border-[#F1E2FA] contain-inline-size overflow-clip bg-white dark:bg-black shadow-[10px_1px_20px_1px_black]">
-
               <Textarea
                 ref={inputRef}
-                className="resize-none max-h-48 overflow-auto !border-none focus-visible:ring-0 !shadow-none ml-2 !min-h-8 bg-white dark:bg-black !text-xl"
+                className="resize-none max-h-48 overflow-auto !border-none focus-visible:ring-0 !
+                none ml-2 !min-h-8 bg-white dark:bg-black !text-xl"
                 value={query}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyDown}
@@ -769,4 +821,39 @@ export default function LLMAggregator() {
       </div>
     </div>
   );
+}
+
+function ProductSlider({data}) {
+  console.log(data.thumbnails && data.thumbnails.length > 0);
+  const [index, setIndex] = useState(0);
+  return <div className="flex justify-center w-full">
+    {
+      data.thumbnails && data.thumbnails.length > 0 ?
+          <div className="flex gap-[15] align-center">
+            <img src={`/image/dark-left.png`} width={20} height={20}
+                 onClick={() => {
+                   setIndex([Math.abs(index + 1) % data.thumbnails.length])
+                 }}
+            />
+            {
+              <img
+                  src={data.thumbnails[index]}
+                  alt="product"
+                  className="max-w-[200px] max-h-[200px] pt-3"
+              />
+            }
+            <img src={`/image/dark-right.png`} width={20} height={20}
+                 onClick={() => {
+                   setIndex([Math.abs(index - 1) % data.thumbnails.length])
+                 }}
+            />
+          </div> :
+          <img
+              src={data.main}
+              alt="product"
+              className="max-w-[200px] max-h-[200px] pt-3"
+          />
+    }
+  </div>
+
 }

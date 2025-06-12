@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFingerprint } from "@/components/FingerPrint";
 import toast from "react-hot-toast";
+import { useTheme } from 'next-themes'
 
 const Login = () => {
   const router = useRouter();
@@ -13,6 +14,7 @@ const Login = () => {
   const [token, setToken] = useState('');
   const [verified, setVerified] = useState(true);
   const [hideSideBar, setHideSideBar] = useState(true);
+  const { theme, setTheme } = useTheme();
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -110,7 +112,9 @@ const Login = () => {
       >
         <header className="flex justify-between items-center p-2">
           <div className="flex mx-3">
-            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30] self-start mt-1 cursor-pointer" onClick={() => setHideSideBar(false)}>
+            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30] self-start mt-1 cursor-pointer"
+                                 style={{color: theme === "light" ? "black" : "white"}}
+                                 onClick={() => setHideSideBar(false)}>
               <path d="M20 7L4 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
               <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
               <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>

@@ -273,16 +273,17 @@ export default function BoomAggregator() {
 
       {/* Sidebar */}
       
-        <div
+        <div ref={scrollRef}
           className={`
             fixed top-0 left-0 z-50
-            w-[300px] h-full flex flex-col items-center py-4 gap-3
+            overflow-y-auto
+            w-[300px] h-full  py-4 gap-3
             !bg-white !text-black
             transform transition-transform duration-300 ease-in-out
             ${hideSideBar ? '-translate-x-full' : 'translate-x-0'}
           `}
         >
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-3 overflow-y-auto">
           <div className="absolute top-0 right-0 px-2 pt-3 cursor-pointer" onClick={() => setHideSideBar(true)}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30]">
               <path d="M13 19L7 12L13 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
@@ -332,8 +333,8 @@ export default function BoomAggregator() {
             </div>
           </div>
         </div>
-        <div className="w-full px-4 gap-2 flex flex-col overflow-y-auto"
-          ref={scrollRef}
+        <div className="w-full px-4 gap-2 flex flex-col mt-5"
+
         >
           {Array.isArray(productHistory) && productHistory.filter((item) => item.query.indexOf(search) > -1).map((item, index) => {
             return (
@@ -385,6 +386,7 @@ export default function BoomAggregator() {
       <div
         className={`
           flex-1 flex flex-col
+          overflow-y-auto
           bg-[url('/image/background-boom.png')]
           bg-[length:100%_100%] bg-no-repeat bg-center
           transition-all duration-300 ease-in-out
@@ -393,7 +395,9 @@ export default function BoomAggregator() {
       >
         <header className="flex justify-between items-center p-2">
           <div className="flex gap-3">
-            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30] self-start mt-1 cursor-pointer" onClick={() => setHideSideBar(false)}>
+            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30] self-start mt-1 cursor-pointer"
+                                 style={{color: theme === "light" ? "black" : "white"}}
+                                 onClick={() => setHideSideBar(false)}>
               <path d="M20 7L4 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
               <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
               <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
@@ -479,7 +483,7 @@ export default function BoomAggregator() {
             </div>
           </div>
         }
-        <div className="w-full overflow-y-auto p-8">
+        <div className="w-full  p-8">
           {productType === 'specific' && Array.isArray(products) && products.length > 0 && (
             <>
               <div className="text-2xl">
