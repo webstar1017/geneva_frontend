@@ -72,7 +72,7 @@ const MarkdownRenderer = ({ content }) => {
         td: ({ children }) => <td className="px-4 py-2 border border-gray-300">{children}</td>,
         code({ className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
-          
+
           if (match) {
             // Code block with language
             return <CodeBlock language={match[1]}>{children}</CodeBlock>;
