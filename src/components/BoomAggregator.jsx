@@ -490,19 +490,26 @@ export default function BoomAggregator() {
                 Best match for you:
               </div>
               <div className="w-full flex justify-center mb-6 mt-4">
-                <div
-                  className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
-                  onClick={() => linkToProduct(products[0].url)}
-                >
-                  <div className="flex justify-center w-full">
-                    <img
-                      src={products[0].image}
-                      alt="product"
-                      className="max-w-[200px] max-h-[200px] pt-3"
-                    />
-                  </div>
-                  <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{products[0].price}</div>
-                </div>
+                <ProductSlider
+                  linkToProduct={linkToProduct}
+                  image={products[0].image}
+                  thumbnails={products[0].thumbnails}
+                  url={products[0].url}
+                  price={products[0].price}
+                />
+                {/*<div*/}
+                {/*  className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"*/}
+                {/*  onClick={() => linkToProduct(products[0].url)}*/}
+                {/*>*/}
+                {/*  <div className="flex justify-center w-full">*/}
+                {/*    <img*/}
+                {/*      src={products[0].image}*/}
+                {/*      alt="product"*/}
+                {/*      className="max-w-[200px] max-h-[200px] pt-3"*/}
+                {/*    />*/}
+                {/*  </div>*/}
+                {/*  <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{products[0].price}</div>*/}
+                {/*</div>*/}
               </div>
               <div className="text-2xl mb-4">
                 Alternatives to choose from:
@@ -514,20 +521,27 @@ export default function BoomAggregator() {
             {Array.isArray(products) && (
               (productType === 'specific' ? products.slice(1) : products)
                 .map((item, index) => (
-                  <div
-                    key={index}
-                    className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
-                    onClick={() => linkToProduct(item.url)}
-                  >
-                    <div className="flex justify-center w-full">
-                      <img
-                        src={item.image}
-                        alt="product"
-                        className="max-w-[200px] max-h-[200px] pt-3"
-                      />
-                    </div>
-                    <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{item.price}</div>
-                  </div>
+                    <ProductSlider
+                        linkToProduct={linkToProduct}
+                        image={item.image}
+                        thumbnails={item.thumbnails}
+                        url={item.url}
+                        price={item.price}
+                    />
+                  // <div
+                  //   key={index}
+                  //   className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
+                  //   onClick={() => linkToProduct(item.url)}
+                  // >
+                  //   <div className="flex justify-center w-full">
+                  //     <img
+                  //       src={item.image}
+                  //       alt="product"
+                  //       className="max-w-[200px] max-h-[200px] pt-3"
+                  //     />
+                  //   </div>
+                  //   <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{item.price}</div>
+                  // </div>
                 ))
             )}
           </div>
@@ -535,4 +549,60 @@ export default function BoomAggregator() {
       </div>
     </div>
   );
+}
+
+function ProductSlider({image, thumbnails, url,linkToProduct, price, id}) {
+  const [index, setIndex] = useState(0);
+  const {theme, setTheme} = useTheme();
+  return <div className="flex items-center gap-[15] align-center" id={id}>
+    {
+        thumbnails && thumbnails.length > 0 &&
+        <div>
+          <img src={`/image/${theme == "light" ? "dark" : "white" }-left.png`} width={20} height={20}
+               onClick={() => {
+                 setIndex(prevIndex => (prevIndex + 1) % thumbnails.length);
+               }}
+               className="cursor-pointer"
+          />
+        </div>
+    }
+    <div
+      className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
+      onClick={() => linkToProduct(url)}
+  >
+
+    <div className="flex justify-center w-full">
+      {
+          thumbnails && thumbnails.length > 1 ?
+          <img
+              src={thumbnails[index]}
+              alt="product"
+              className="max-w-[200px] max-h-[200px] pt-3"
+          />:
+        <img
+          src={image}
+          alt="product"
+          className="max-w-[200px] max-h-[200px] pt-3"
+        />
+      }
+      <img
+          src={image}
+          alt="product"
+          className="max-w-[200px] max-h-[200px] pt-3"
+      />
+    </div>
+    <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{price}</div>
+  </div>
+    {
+        thumbnails && thumbnails.length > 1 &&
+        <div>
+          <img src={`/image/${theme == "light" ? "dark" : "white" }-right.png`} width={20} height={20}
+               onClick={() => {
+                 setIndex(prevIndex => (prevIndex + 1) % thumbnails.length);
+               }}
+               className="cursor-pointer"
+          />
+        </div>
+    }
+  </div>
 }
