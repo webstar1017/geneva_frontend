@@ -597,6 +597,15 @@ export function LLMAggregator() {
                         </div>}
                         {item.verify_top_open && <span className="mt-4 text-2xl">
                     <MarkdownRenderer content={item.opinion} color={theme}/>
+                          <div align="center">
+                        {
+                            <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                                 onClick={() => {
+                                   setVerifyOpen(index,  "top")
+                                 }}
+                            />
+                        }
+                      </div>
                   </span>}
                       </div>}
                       {
@@ -634,18 +643,17 @@ export function LLMAggregator() {
                                                           style={{color: theme === "light" ? "black" : "white"}}
                         >
                     <MarkdownRenderer content={item.opinion} color={theme}/>
+                          <div align="center">
+                        {
+                          <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                               onClick={() => {
+                                 setVerifyOpen(index,  "bottom")
+                               }}
+                          />
+                        }
+                          </div>
                   </span>}
                       </div>}
-                      <div align="center">
-                        {
-                            !item.close &&
-                            <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                                 onClick={() => {
-                                   handleCancel(index)
-                                 }}
-                            />
-                        }
-                      </div>
                     </div>
                 )
               } else if (item.type == 'compare_product') {
@@ -679,6 +687,15 @@ export function LLMAggregator() {
                         </div>}
                         {item.verify_top_open && <span className="mt-4 text-2xl">
                     <MarkdownRenderer content={item.opinion} color={theme}/>
+                      <div align="center">
+                        {
+                          <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
+                               onClick={() => {
+                                 setVerifyOpen(index,  "top")
+                               }}
+                          />
+                        }
+                      </div>
                   </span>}
                       </div>}
                       {
@@ -733,18 +750,16 @@ export function LLMAggregator() {
                         </div>}
                         {item.verify_bottom_open && <span className="mt-4 text-2xl">
                     <MarkdownRenderer content={item.opinion} color={theme}/>
-                  </span>}
-                      </div>}
-                      <div align="center">
-                        {
-                            !item.close &&
+                          <div align="center">
+
                             <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
                                  onClick={() => {
-                                   handleCancel(index)
+                                   setVerifyOpen(index,  "bottom")
                                  }}
                             />
-                        }
-                      </div>
+                          </div>
+                  </span>}
+                      </div>}
                     </div>
                 )
               } else if (item.type == "general_product") {
@@ -779,16 +794,6 @@ export function LLMAggregator() {
                         You can also browse & shop from the Boom Marketplace <a link='#'
                                                                                 className="underline cursor-pointer"
                                                                                 onClick={() => router.push('/marketplace')}>here</a>
-                      </div>
-                      <div align="center">
-                        {
-                            !item.close &&
-                            <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                                 onClick={() => {
-                                   handleCancel(index)
-                                 }}
-                            />
-                        }
                       </div>
                     </div>
                 )
@@ -841,16 +846,6 @@ export function LLMAggregator() {
                         You can also browse & shop from the Boom Marketplace <a link='#'
                                                                                 className="underline cursor-pointer"
                                                                                 onClick={() => router.push('/marketplace')}>here</a>
-                      </div>
-                      <div align="center">
-                        {
-                            !item.close &&
-                            <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                                 onClick={() => {
-                                   handleCancel(index)
-                                 }}
-                            />
-                        }
                       </div>
                     </div>
                 )
