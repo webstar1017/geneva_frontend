@@ -596,13 +596,13 @@ export function LLMAggregator() {
                           ))}
                         </div>}
                         {item.verify_top_open && <span className="mt-4 text-2xl">
-                    <MarkdownRenderer content={item.opinion}/>
+                    <MarkdownRenderer content={item.opinion} color={theme}/>
                   </span>}
                       </div>}
                       {
                           !item.close &&
                           <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                            <MarkdownRenderer content={item.text}/>
+                            <MarkdownRenderer content={item.text} color={theme}/>
                           </div>
                       }
                       {<div className="flex flex-col mx-4 dark:text-white text-xl">
@@ -619,7 +619,9 @@ export function LLMAggregator() {
                         {item.verify_bottom_open && <div className="[display:ruby] font-semibold mt-4">
                           {item.status_report.map((item, index) => (
                               <div key={index} className="flex items-center gap-1 mr-2">
-                                <span>{item.model}</span>
+                                <span
+                                    style={{color: theme === "light" ? "black" : "white"}}
+                                >{item.model}</span>
                                 {item.status === 'success' ? (
                                     <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
                                 ) : (
@@ -628,8 +630,10 @@ export function LLMAggregator() {
                               </div>
                           ))}
                         </div>}
-                        {item.verify_bottom_open && <span className="mt-4 text-2xl">
-                    <MarkdownRenderer content={item.opinion}/>
+                        {item.verify_bottom_open && <span className="mt-4 text-2xl"
+                                                          style={{color: theme === "light" ? "black" : "white"}}
+                        >
+                    <MarkdownRenderer content={item.opinion} color={theme}/>
                   </span>}
                       </div>}
                       <div align="center">
@@ -651,7 +655,9 @@ export function LLMAggregator() {
                         <div className="flex items-center gap-2 mt-6">
                           <img src="/image/verify.png" alt="verify" className="w-[20]"/>
                           <span
-                              className="font-semibold">Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.status_report.length} models</span>
+                              className="font-semibold"
+                              style={{color: theme === "light" ? "black" : "white"}}
+                          >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.status_report.length} models</span>
                           <img src="/image/down.png" alt="down"
                                className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_top_open ? 'rotate-x-180' : ''}`}
                                onClick={() => setVerifyOpen(index, 'top')}/>
@@ -660,7 +666,9 @@ export function LLMAggregator() {
                         {item.verify_top_open && <div className="[display:ruby] font-semibold mt-4">
                           {item.status_report.map((item, index) => (
                               <div key={index} className="flex items-center gap-1 mr-2">
-                                <span>{item.model}</span>
+                                <span
+                                    style={{color: theme === "light" ? "black" : "white"}}
+                                >{item.model}</span>
                                 {item.status === 'success' ? (
                                     <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
                                 ) : (
@@ -670,13 +678,13 @@ export function LLMAggregator() {
                           ))}
                         </div>}
                         {item.verify_top_open && <span className="mt-4 text-2xl">
-                    <MarkdownRenderer content={item.opinion}/>
+                    <MarkdownRenderer content={item.opinion} color={theme}/>
                   </span>}
                       </div>}
                       {
                           !item.close &&
                           <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                            <MarkdownRenderer content={item.text}/>
+                            <MarkdownRenderer content={item.text} color={theme}/>
                             <div
                                 className="text-2xl">Here {item.product.length > 1 ? 'are the products' : 'is the product'}:
                             </div>
@@ -684,22 +692,15 @@ export function LLMAggregator() {
                                 className="w-full px-4 py-4 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 justify-items-center">
                               {item.product.map((product, id) => {
                                 return (
-                                    <div
-                                        key={id}
-                                        className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
-                                        onClick={() => linkToProduct(product.url)}
-                                    >
-                                      <div
-                                          className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.title}</div>
-                                      <ProductSlider
-                                          data={{
-                                            main: product.image,
-                                            thumbnails: product.thumbnails
-                                          }}
-                                      />
-                                      <div
-                                          className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
-                                    </div>
+                                    <ProductSlider
+                                        id={id}
+                                        product={product}
+                                        linkToProduct={linkToProduct}
+                                        data={{
+                                          main: item.product[0].image,
+                                          thumbnails:item.product.thumbnails
+                                        }}
+                                    />
                                 )
                               })
                               }
@@ -730,7 +731,7 @@ export function LLMAggregator() {
                           ))}
                         </div>}
                         {item.verify_bottom_open && <span className="mt-4 text-2xl">
-                    <MarkdownRenderer content={item.opinion}/>
+                    <MarkdownRenderer content={item.opinion} color={theme}/>
                   </span>}
                       </div>}
                       <div align="center">
@@ -798,21 +799,14 @@ export function LLMAggregator() {
                       </div>
                       {/* First Product (Single Row) */}
                       {item.product.length > 0 && (
-                          <div className="w-full px-4 py-4 flex justify-center">
-                            <div
-                                className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
-                                onClick={() => linkToProduct(item.product[0].url)}
-                            >
-                              <ProductSlider
-                                  data={{
-                                    main: product[0].image,
-                                    thumbnails: product.thumbnails
-                                  }}
-                              />
-                              <div
-                                  className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{item.product[0].price}</div>
-                            </div>
-                          </div>
+                        <ProductSlider
+                            product={product}
+                          linkToProduct={linkToProduct}
+                          data={{
+                            main: item.product[0].image,
+                            thumbnails: item.product.thumbnails
+                          }}
+                        />
                       )}
                       <div className="px-8 text-2xl mb-4 dark:text-white">
                         And here are alternatives to choose from:
@@ -943,37 +937,47 @@ export function LLMAggregator() {
   );
 }
 
-function ProductSlider({data}) {
+function ProductSlider({data, linkToProduct, id, product}) {
   console.log(data.thumbnails && data.thumbnails.length > 0);
   const [index, setIndex] = useState(0);
-  return <div className="flex justify-center w-full">
-    {
-      data.thumbnails && data.thumbnails.length > 0 ?
-          <div className="flex gap-[15] align-center">
-            <img src={`/image/dark-left.png`} width={20} height={20}
-                 onClick={() => {
-                   setIndex([Math.abs(index + 1) % data.thumbnails.length])
-                 }}
-            />
-            {
-              <img
-                  src={data.thumbnails[index]}
-                  alt="product"
-                  className="max-w-[200px] max-h-[200px] pt-3"
+  return <div
+      key={id}
+      className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
+      onClick={() => linkToProduct(product.url)}
+  >
+    <div
+        className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.title}</div>
+    <div className="flex justify-center w-full">
+      {
+        data.thumbnails && data.thumbnails.length > 0 ?
+            <div className="flex gap-[15] align-center">
+              <img src={`/image/dark-left.png`} width={20} height={20}
+                   onClick={() => {
+                     setIndex(Math.abs(index + 1) % data.thumbnails.length)
+                   }}
               />
-            }
-            <img src={`/image/dark-right.png`} width={20} height={20}
-                 onClick={() => {
-                   setIndex([Math.abs(index - 1) % data.thumbnails.length])
-                 }}
+              {
+                <img
+                    src={data.thumbnails[index]}
+                    alt="product"
+                    className="max-w-[200px] max-h-[200px] pt-3"
+                />
+              }
+              <img src={`/image/dark-right.png`} width={20} height={20}
+                   onClick={() => {
+                     setIndex(Math.abs(index + 1) % data.thumbnails.length)
+                   }}
+              />
+            </div> :
+            <img
+                src={data.main}
+                alt="product"
+                className="max-w-[200px] max-h-[200px] pt-3"
             />
-          </div> :
-          <img
-              src={data.main}
-              alt="product"
-              className="max-w-[200px] max-h-[200px] pt-3"
-          />
-    }
+      }
+    </div>
+    <div
+        className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
   </div>
 
 }
