@@ -698,7 +698,7 @@ export function LLMAggregator() {
                                         linkToProduct={linkToProduct}
                                         data={{
                                           main: item.product[0].image,
-                                          thumbnails:item.product.thumbnails
+                                          thumbnails: item.product.thumbnails
                                         }}
                                     />
                                 )
@@ -799,14 +799,15 @@ export function LLMAggregator() {
                       </div>
                       {/* First Product (Single Row) */}
                       {item.product.length > 0 && (
-                        <ProductSlider
-                            product={product}
-                          linkToProduct={linkToProduct}
-                          data={{
-                            main: item.product[0].image,
-                            thumbnails: item.product.thumbnails
-                          }}
-                        />
+                          <ProductSlider
+                              id={id}
+                              product={product}
+                              linkToProduct={linkToProduct}
+                              data={{
+                                main: item.product[0].image,
+                                thumbnails: item.product.thumbnails
+                              }}
+                          />
                       )}
                       <div className="px-8 text-2xl mb-4 dark:text-white">
                         And here are alternatives to choose from:
@@ -979,5 +980,4 @@ function ProductSlider({data, linkToProduct, id, product}) {
     <div
         className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
   </div>
-
 }
