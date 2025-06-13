@@ -1,6 +1,6 @@
 'use client'
 
-import LLMAggregator from "@/components/LLMAggregator";
+import {LLMAggregator} from "@/components/LLMAggregator";
 import { useFingerprint } from "@/components/FingerPrint";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
