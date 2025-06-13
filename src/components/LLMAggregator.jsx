@@ -953,7 +953,7 @@ function ProductSlider({data, linkToProduct, id, product}) {
             <div className="flex gap-[15] align-center">
               <img src={`/image/dark-left.png`} width={20} height={20}
                    onClick={() => {
-                     setIndex(Math.abs(index + 1) % data.thumbnails.length)
+                     setIndex(prevIndex => (prevIndex + 1) % data.thumbnails.length);
                    }}
               />
               {
@@ -965,7 +965,7 @@ function ProductSlider({data, linkToProduct, id, product}) {
               }
               <img src={`/image/dark-right.png`} width={20} height={20}
                    onClick={() => {
-                     setIndex(Math.abs(index + 1) % data.thumbnails.length)
+                     setIndex(prevIndex => (prevIndex + 1) % data.thumbnails.length);
                    }}
               />
             </div> :
