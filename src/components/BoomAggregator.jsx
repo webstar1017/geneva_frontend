@@ -585,11 +585,6 @@ function ProductSlider({image, thumbnails, url,linkToProduct, price, id}) {
           className="max-w-[200px] max-h-[200px] pt-3"
         />
       }
-      <img
-          src={image}
-          alt="product"
-          className="max-w-[200px] max-h-[200px] pt-3"
-      />
     </div>
     <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{price}</div>
   </div>

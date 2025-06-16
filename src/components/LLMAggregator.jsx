@@ -586,7 +586,7 @@ export function LLMAggregator() {
                         {item.verify_top_open && <div className="[display:ruby] font-semibold mt-4">
                           {item.status_report.map((item, index) => (
                               <div key={index} className="flex items-center gap-1 mr-2">
-                                <span>{item.model}</span>
+                                <span style={{color: theme === "light" ? "black" : "white"}}>{item.model}</span>
                                 {item.status === 'success' ? (
                                     <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
                                 ) : (
@@ -739,7 +739,7 @@ export function LLMAggregator() {
                         {item.verify_bottom_open && <div className="[display:ruby] font-semibold mt-4">
                           {item.status_report.map((item, index) => (
                               <div key={index} className="flex items-center gap-1 mr-2">
-                                <span>{item.model}</span>
+                                <span style={{color: theme === "light" ? "black" : "white"}}>{item.model}</span>
                                 {item.status === 'success' ? (
                                     <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
                                 ) : (
