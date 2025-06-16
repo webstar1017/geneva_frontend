@@ -611,7 +611,7 @@ export function LLMAggregator() {
                       {
                           !item.close &&
                           <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                            <MarkdownRenderer content={item.text} color={theme}/>
+                            <MarkdownRenderer content={item.text} color={theme} bg={true}/>
                           </div>
                       }
                       {<div className="flex flex-col mx-4 dark:text-white text-xl">
@@ -701,7 +701,7 @@ export function LLMAggregator() {
                       {
                           !item.close &&
                           <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                            <MarkdownRenderer content={item.text} color={theme}/>
+                            <MarkdownRenderer content={item.text} color={theme} bg={true}/>
                             <div
                                 className="text-2xl">Here {item.product.length > 1 ? 'are the products' : 'is the product'}:
                             </div>
