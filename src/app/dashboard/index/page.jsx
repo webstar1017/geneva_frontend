@@ -124,7 +124,7 @@ function Dashboard() {
                     />
                 </div>
             </div>
-            <Item title="Cost to date" value="$375"/>
+            <Item title="Cost to date" value={`$${data.cost_to_date}`}/>
         </div>
     </div>
 }
