@@ -7,30 +7,30 @@ import {useEffect, useState} from "react";
 
 function Dashboard() {
     const [data, setData] = useState({
-        "token_count": 0,
-        "chat_count": 0,
-        "product_count": 0,
-        "monthly_active": 0,
-        "total_input_tokens": 0,
-        "total_output_tokens": 0,
-        "cost_to_date": 0
+        "token_count": 4575,
+        "chat_count": 76,
+        "product_count": 24,
+        "monthly_active": 1336,
+        "total_input_tokens": 2074800,
+        "total_output_tokens": 1333800,
+        "cost_to_date": 357
     })
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/dashboard/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        }).then((response) => {
-            if (!response.ok) {
-                throw new Error('error');
-            }
-            return response.json();
-        }).then((response) => {
-            setData(response);
-        }).catch((error) => {
-            console.error(error);
-        });
+        // fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/dashboard/`, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     }
+        // }).then((response) => {
+        //     if (!response.ok) {
+        //         throw new Error('error');
+        //     }
+        //     return response.json();
+        // }).then((response) => {
+        //     setData(response);
+        // }).catch((error) => {
+        //     console.error(error);
+        // });
     }, []);
     const isMobile = useIsMobile();
     const BAR_NEW_OPTIONS = {
