@@ -108,7 +108,7 @@ function Dashboard() {
         <div align="center" className="text-[40px] font-bold">Dashboard</div>
         <div className="grid grid-cols-4 mt-[35px] gap-4">
             <Item title="Total Users" value={data.token_count}/>
-            <Item title="Montly Active" value={data.monthly_active}/>
+            <Item title="Monthly Active" value={data.monthly_active}/>
             <Item title="Total Input Tokens" value={data.total_input_tokens}/>
             <Item title="Total Output Tokens" value={data.total_output_tokens}/>
         </div>
