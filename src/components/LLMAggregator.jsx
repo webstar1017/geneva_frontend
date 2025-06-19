@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from 'next-themes'
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -13,10 +12,9 @@ import {
   DialogTrigger,
   DialogClose
 } from "@/components/ui/dialog"
-import toast from 'react-hot-toast';
-import MarkdownRenderer from "./MarkdownRenderer";
 import { useFingerprint } from "./FingerPrint";
 import useIsMobile from "@/components/useIsMobile";
+import Playground from "./Playground";
 
 export function LLMAggregator() {
   const themes = [
@@ -27,7 +25,6 @@ export function LLMAggregator() {
   const fingerprint = useFingerprint();
   const router = useRouter();
   const {theme, setTheme} = useTheme()
-  const [query, setQuery] = useState('');
   const [waitingAnswer, setWaitingAnswer] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [filterList, setFilterList] = useState([]);
@@ -40,25 +37,11 @@ export function LLMAggregator() {
   const [search, setSearch] = useState("");
   const scrollRef = useRef(null);
 
-  // Function to handle the auto resizing of the textarea
-  const handleInputChange = (e) => {
-    setQuery(e.target.value);
-    const textarea = e.target;
-    textarea.style.height = 'auto'; // Reset height before recalculating
-    textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
-  };
 
-  const handleCancel = (index) => {
-    const filter_list = JSON.parse(JSON.stringify(filterList));
-    filter_list[index]["close"] = true;
-    setFilterList((filter_list));
-  };
-
-  const askQuestion = () => {
+  const askQuestion = (query) => {
     let chat_id = localStorage.getItem('chat_id');
     const question = query;
     const history = filterList;
-    setQuery('');
     const textarea = inputRef.current;
     textarea.style.height = 'auto';        // Reset height
     textarea.style.height = '44px';
@@ -179,16 +162,7 @@ export function LLMAggregator() {
     });
   }
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      if (e.shiftKey) {
-        console.log('Shift + Enter pressed');
-      } else {
-        e.preventDefault();
-        askQuestion();
-      }
-    }
-  };
+  
 
   const changeTheme = () => {
     // setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -209,6 +183,7 @@ export function LLMAggregator() {
       }
       return response.json();
     }).then((response) => {
+      console.log(response);
       const history = [];
       response.map((item) => {
         history.push({
@@ -304,7 +279,6 @@ export function LLMAggregator() {
 
   const addNewChatId = () => {
     setFilterList([]);
-    setQuery('');
     const textarea = inputRef.current;
     textarea.style.height = 'auto';        // Reset height
     textarea.style.height = '44px';
@@ -335,36 +309,6 @@ export function LLMAggregator() {
     } else {
       toast.error(`You don't have permission`);
     }
-  }
-
-  const copyAnswer = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success('Copied to clipboard!');
-    } catch (err) {
-      toast.error('Failed to copy!');
-    }
-  }
-
-  const setVerifyOpen = (index, position) => {
-    if (position == 'top') {
-      setFilterList(prevList =>
-          prevList.map((item, i) =>
-              i === index ? {...item, verify_top_open: !item.verify_top_open} : item
-          )
-      );
-    }
-    if (position == 'bottom') {
-      setFilterList(prevList =>
-          prevList.map((item, i) =>
-              i === index ? {...item, verify_bottom_open: !item.verify_bottom_open} : item
-          )
-      );
-    }
-  };
-
-  const linkToProduct = (url) => {
-    window.open(url, '_blank');
   }
 
   useEffect(() => {
@@ -457,13 +401,6 @@ export function LLMAggregator() {
             </div>
           </div>
           <div className="w-full px-4 gap-2 flex flex-col mt-5">
-            <div>
-              <Button
-                  className="w-full bg-[#DCEAF7] hover:bg-[#DCEAF7] text-black overflow-hidden"
-
-              >123
-              </Button>
-            </div>
             {chatList.filter((item) => item.text.indexOf(search) > -1).map((item, index) => {
               return (
                   <div key={index} className="relative group w-full">
@@ -552,384 +489,15 @@ export function LLMAggregator() {
                 className="w-[40] h-auto scale-x-[-1] cursor-pointer"
             />
           </header>
-          <div className={`overflow-y-auto scrollbar-neutral-800 ${filterList.length ? 'flex-1' : ''}`}>
-            {filterList.map((item, index) => {
-              if (item.type == 'question') {
-                return (
-                    <div key={index} className="mx-auto flex flex-1 gap-4 md:max-w-3xl">
-                      <div className="w-full px-4 py-4">
-                        <div className="flex w-full flex-col gap-1 empty:hidden items-end rtl:items-start">
-                          <div className="relative max-w-[var(--user-chat-width,70%)] rounded-3xl py-2.5 text-2xl"
-                               style={{color: theme === "light" ? "black" : "white"}}
-                          >
-                            {item.text}
-                            <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                )
-              } else if (item.type == 'answer') {
-                return (
-                    <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
-                      {<div className="flex flex-col mx-4 dark:text-white text-xl my-6">
-                        <div className="flex items-center gap-2 mt-6">
-                          <img src="/image/verify.png" alt="verify" className="w-[20]"/>
-                          <span className="font-semibold"
-                                style={{color: theme === "light" ? "black" : "white"}}
-                          >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.level == 'Easy' ? 3 : item.level == 'Medium' ? 5 : 7} models</span>
-                          <img src="/image/down.png" alt="down"
-                               className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_top_open ? 'rotate-x-180' : ''}`}
-                               onClick={() => setVerifyOpen(index, 'top')}/>
-                          <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
-                        </div>
-                        {item.verify_top_open && <div className="[display:ruby] font-semibold mt-4">
-                          {item.status_report.map((item, index) => (
-                              <div key={index} className="flex items-center gap-1 mr-2">
-                                <span style={{color: theme === "light" ? "black" : "white"}}>{item.model}</span>
-                                {item.status === 'success' ? (
-                                    <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
-                                ) : (
-                                    <img src="/image/failed.png" className="w-[20px] h-[20px]" alt="failed"/>
-                                )}
-                              </div>
-                          ))}
-                        </div>}
-                        {item.verify_top_open && <span className="mt-4 text-2xl">
-                    <MarkdownRenderer content={item.opinion} color={theme}/>
-                          <div align="center">
-                        {
-                            <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                                 onClick={() => {
-                                   setVerifyOpen(index,  "top")
-                                 }}
-                            />
-                        }
-                      </div>
-                  </span>}
-                      </div>}
-                      {
-                          !item.close &&
-                          <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                            <MarkdownRenderer content={item.text} color={theme} bg={true}/>
-                          </div>
-                      }
-                      {<div className="flex flex-col mx-4 dark:text-white text-xl">
-                        <div className="flex items-center gap-2 mt-6">
-                          <img src="/image/verify.png" alt="verify" className="w-[20]"/>
-                          <span className="font-semibold"
-                                style={{color: theme === "light" ? "black" : "white"}}
-                          >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.level == 'Easy' ? 3 : item.level == 'Medium' ? 5 : 7} models</span>
-                          <img src="/image/down.png" alt="down"
-                               className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_bottom_open ? 'rotate-x-180' : ''}`}
-                               onClick={() => setVerifyOpen(index, 'bottom')}/>
-                          <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
-                        </div>
-                        {item.verify_bottom_open && <div className="[display:ruby] font-semibold mt-4">
-                          {item.status_report.map((item, index) => (
-                              <div key={index} className="flex items-center gap-1 mr-2">
-                                <span
-                                    style={{color: theme === "light" ? "black" : "white"}}
-                                >{item.model}</span>
-                                {item.status === 'success' ? (
-                                    <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
-                                ) : (
-                                    <img src="/image/failed.png" className="w-[20px] h-[20px]" alt="failed"/>
-                                )}
-                              </div>
-                          ))}
-                        </div>}
-                        {item.verify_bottom_open && <span className="mt-4 text-2xl"
-                                                          style={{color: theme === "light" ? "black" : "white"}}
-                        >
-                    <MarkdownRenderer content={item.opinion} color={theme}/>
-                          <div align="center">
-                        {
-                          <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                               onClick={() => {
-                                 setVerifyOpen(index,  "bottom")
-                               }}
-                          />
-                        }
-                          </div>
-                  </span>}
-                      </div>}
-                    </div>
-                )
-              } else if (item.type == 'compare_product') {
-                return (
-                    <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
-                      {<div className="flex flex-col mx-4 dark:text-white text-xl my-6">
-                        <div className="flex items-center gap-2 mt-6">
-                          <img src="/image/verify.png" alt="verify" className="w-[20]"/>
-                          <span
-                              className="font-semibold"
-                              style={{color: theme === "light" ? "black" : "white"}}
-                          >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.status_report.length} models</span>
-                          <img src="/image/down.png" alt="down"
-                               className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_top_open ? 'rotate-x-180' : ''}`}
-                               onClick={() => setVerifyOpen(index, 'top')}/>
-                          <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
-                        </div>
-                        {item.verify_top_open && <div className="[display:ruby] font-semibold mt-4">
-                          {item.status_report.map((item, index) => (
-                              <div key={index} className="flex items-center gap-1 mr-2">
-                                <span
-                                    style={{color: theme === "light" ? "black" : "white"}}
-                                >{item.model}</span>
-                                {item.status === 'success' ? (
-                                    <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
-                                ) : (
-                                    <img src="/image/failed.png" className="w-[20px] h-[20px]" alt="failed"/>
-                                )}
-                              </div>
-                          ))}
-                        </div>}
-                        {item.verify_top_open && <span className="mt-4 text-2xl">
-                    <MarkdownRenderer content={item.opinion} color={theme}/>
-                      <div align="center">
-                        {
-                          <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                               onClick={() => {
-                                 setVerifyOpen(index,  "top")
-                               }}
-                          />
-                        }
-                      </div>
-                  </span>}
-                      </div>}
-                      {
-                          !item.close &&
-                          <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
-                            <MarkdownRenderer content={item.text} color={theme} bg={true}/>
-                            <div
-                                className="text-2xl">Here {item.product.length > 1 ? 'are the products' : 'is the product'}:
-                            </div>
-                            <div
-                                className="w-full px-4 py-4 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 justify-items-center">
-                              {item.product.map((product, id) => {
-                                return (
-                                    <ProductSlider
-                                        id={id}
-                                        key={id}
-                                        product={product}
-                                        linkToProduct={linkToProduct}
-                                        data={{
-                                          main: product.image,
-                                          thumbnails: product.thumbnails
-                                        }}
-                                    />
-                                )
-                              })
-                              }
-                            </div>
-                          </div>
-                      }
-                      {<div className="flex flex-col mx-4 dark:text-white text-xl">
-                        <div className="flex items-center gap-2 mt-6">
-                          <img src="/image/verify.png" alt="verify" className="w-[20]"/>
-                          <span className="font-semibold"
-                                style={{color: theme === "light" ? "black" : "white"}}
-                          >Verified by {item.status_report.filter(item => item.status == 'success').length} out of {item.status_report.length} models</span>
-                          <img src="/image/down.png" alt="down"
-                               className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_bottom_open ? 'rotate-x-180' : ''}`}
-                               onClick={() => setVerifyOpen(index, 'bottom')}/>
-                          <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)}/>
-                        </div>
-                        {item.verify_bottom_open && <div className="[display:ruby] font-semibold mt-4">
-                          {item.status_report.map((item, index) => (
-                              <div key={index} className="flex items-center gap-1 mr-2">
-                                <span style={{color: theme === "light" ? "black" : "white"}}>{item.model}</span>
-                                {item.status === 'success' ? (
-                                    <img src="/image/success.png" className="w-[20px] h-[20px]" alt="success"/>
-                                ) : (
-                                    <img src="/image/failed.png" className="w-[20px] h-[20px]" alt="failed"/>
-                                )}
-                              </div>
-                          ))}
-                        </div>}
-                        {item.verify_bottom_open && <span className="mt-4 text-2xl">
-                    <MarkdownRenderer content={item.opinion} color={theme}/>
-                          <div align="center">
-
-                            <img src={"/image/cancel_button.png"} width={50} height={50} className="cursor-pointer"
-                                 onClick={() => {
-                                   setVerifyOpen(index,  "bottom")
-                                 }}
-                            />
-                          </div>
-                  </span>}
-                      </div>}
-                    </div>
-                )
-              } else if (item.type == "general_product") {
-                return (
-                    <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
-                      <div className="px-8 text-2xl mb-4 dark:text-white">
-                        Certainly! Here are some options picked for you
-                      </div>
-                      <div
-                          className="w-full px-4 py-4 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 justify-items-center">
-                        {item.product.map((product, id) => {
-                          return (
-                              <div
-                                  key={id}
-                                  className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
-                                  onClick={() => linkToProduct(product.url)}
-                              >
-                                <div className="flex justify-center w-full">
-                                  <img
-                                      src={product.image}
-                                      alt="product"
-                                      className="max-w-[200px] max-h-[200px] pt-3"
-                                  />
-                                </div>
-                                <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
-                              </div>
-                          )
-                        })
-                        }
-                      </div>
-                      <div className="px-8 text-2xl mt-4 dark:text-white">
-                        You can also browse & shop from the Boom Marketplace <a link='#'
-                                                                                className="underline cursor-pointer"
-                                                                                onClick={() => router.push('/marketplace')}>here</a>
-                      </div>
-                    </div>
-                )
-              } else {
-                return (
-                    <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
-                      <div className="px-8 text-2xl mb-4 dark:text-white">
-                        Certainly! Here it is:
-                      </div>
-                      {/* First Product (Single Row) */}
-                      {item.product.length > 0 && (
-                          <ProductSlider
-                              id={id}
-                              key={id}
-                              product={product}
-                              linkToProduct={linkToProduct}
-                              data={{
-                                main: product.image,
-                                thumbnails: product.thumbnails
-                              }}
-                          />
-                      )}
-                      <div className="px-8 text-2xl mb-4 dark:text-white">
-                        And here are alternatives to choose from:
-                      </div>
-                      {/* Remaining Products (Grid) */}
-                      {item.product.length > 1 && (
-                          <div
-                              className="w-full px-4 py-4 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 justify-items-center">
-                            {item.product.slice(1).map((product, id) => (
-                                <div
-                                    key={id}
-                                    className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
-                                    onClick={() => linkToProduct(product.url)}
-                                >
-                                  <div className="flex justify-center w-full">
-                                    <img
-                                        src={product.image}
-                                        alt="product"
-                                        className="max-w-[200px] max-h-[200px] pt-3"
-                                    />
-                                  </div>
-                                  <div
-                                      className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
-                                </div>
-                            ))}
-                          </div>
-                      )}
-                      <div className="px-8 text-2xl mt-4 dark:text-white">
-                        You can also browse & shop from the Boom Marketplace <a link='#'
-                                                                                className="underline cursor-pointer"
-                                                                                onClick={() => router.push('/marketplace')}>here</a>
-                      </div>
-                    </div>
-                )
-              }
-            })}
-
-            {waitingAnswer && <div ref={waitingRef} className="mx-auto flex flex-col flex-1 md:max-w-3xl my-4">
-              <div className="mx-4 py-4 flex text-2xl">
-                <img src="/image/logo.png" alt="logo" className="w-[30] mr-2"/>
-                <span style={{color: theme === "light" ? "dark" : "white"}}>
-                Consulting the council
-              </span>
-                <span className="ml-2 flex">
-                <span className="dot dot1" style={{color: theme === "light" ? "dark" : "white"}}>.</span>
-                <span className="dot dot2" style={{color: theme === "light" ? "dark" : "white"}}>.</span>
-                <span className="dot dot3" style={{color: theme === "light" ? "dark" : "white"}}>.</span>
-              </span>
-                <style jsx>{`
-                  .dot {
-                    animation: bounce 1.5s infinite;
-                    font-size: 2rem;
-                    line-height: 1;
-                    margin-top: -4px;
-                  }
-
-                  .dot1 {
-                    animation-delay: 0s;
-                  }
-
-                  .dot2 {
-                    animation-delay: 0.2s;
-                  }
-
-                  .dot3 {
-                    animation-delay: 0.4s;
-                  }
-
-                  @keyframes bounce {
-                    0%, 80%, 100% {
-                      transform: scale(1);
-                      opacity: 0.5;
-                    }
-                    40% {
-                      transform: scale(1.4);
-                      opacity: 1;
-                    }
-                  }
-                `}</style>
-              </div>
-            </div>}
-
-          </div>
-          <div className={`flex mx-auto px-3 md:px-4 w-full pb-6 ${filterList.length ? '' : 'flex-1'}`}>
-            <div
-                className="mx-auto flex flex-col flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl xl:max-w-[48rem] justify-center items-center">
-              {!filterList.length && (
-                  <div className="flex flex-col items-center">
-                  <span className="text-[60px]"
-                        style={{color: theme === "light" ? "black" : "white"}}
-                  >Welcome to Geneva</span>
-                    <span className="text-3xl my-15"
-                          style={{color: theme === "light" ? "black" : "white"}}
-                    >We intelligently unify AIs to give you high-quality, trusted answers & smarter discovery</span>
-                  </div>
-              )}
-              <div
-                  className="flex w-full pb-2 cursor-text flex-col items-center justify-center rounded-[20px] border border-[#F1E2FA] contain-inline-size overflow-clip bg-white dark:bg-black shadow-[10px_1px_20px_1px_black]">
-                <Textarea
-                    ref={inputRef}
-                    className="resize-none max-h-48 overflow-auto !border-none focus-visible:ring-0 !
-                none ml-2 !min-h-8 bg-white dark:bg-black !text-xl"
-                    value={query}
-                    onChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    rows="1" // Initially set to 1 row
-                    placeholder="Ask Geneva anything"
-                />
-                <div className="flex w-full px-2">
-                  <img src="/image/logo.png" alt="logo" className="w-[30] ml-auto cursor-pointer"
-                       onClick={askQuestion}/>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Playground
+            theme={theme}
+            filterList={filterList} 
+            waitingAnswer={waitingAnswer}
+            setFilterList={setFilterList}
+            inputRef={inputRef}
+            askQuestion={askQuestion}
+            waitingRef={waitingRef}
+          />
         </div>
       </div>
   );
