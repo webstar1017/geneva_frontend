@@ -36,7 +36,6 @@ export function LLMAggregator() {
   const inputRef = useRef(null);
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
   const scrollRef = useRef(null);
 
 
@@ -68,11 +67,13 @@ export function LLMAggregator() {
       signal: signal,
       body: JSON.stringify({user_id: fingerprint, chat_id: chat_id, question: question, history: history})
     }).then((response) => {
-      if (!response.ok) {
-        throw new Error('error');
-      }
-      return response.json();
+      // if (!response.ok) {
+      //   throw new Error('error');
+      // }
+      return false;
     }).then((response) => {
+      setWaitingAnswer(false);
+      if (!response) return;
       if (response.level.includes('product')) {
         if (response.level == 'compare_product') {
           const final_answer = JSON.parse(response.answer);
@@ -157,7 +158,7 @@ export function LLMAggregator() {
           text: question
         }]);
       }
-      setWaitingAnswer(false);
+      
     }).catch((error) => {
       console.error(error);
       setWaitingAnswer(false);

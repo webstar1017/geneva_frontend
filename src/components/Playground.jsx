@@ -74,7 +74,9 @@ function Playground({
                                         style={{ color: theme === "light" ? "black" : "white" }}
                                     >
                                         {item.text}
-                                        <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)} />
+                                        {
+                                            item.text != "" && <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)} />
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -92,7 +94,9 @@ function Playground({
                                     <img src="/image/down.png" alt="down"
                                         className={`w-[16px] h-[16px] transition-transform duration-200 ${!item.verify_top_open ? 'rotate-x-180' : ''}`}
                                         onClick={() => setVerifyOpen(index, 'top')} />
-                                    <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)} />
+                                    {
+                                        <img src="/image/copy.png" className="w-[20]" onClick={() => copyAnswer(item.text)} />
+                                    }
                                 </div>
                                 {item.verify_top_open && <div className="[display:ruby] font-semibold mt-4">
                                     {item.status_report.map((item, index) => (
