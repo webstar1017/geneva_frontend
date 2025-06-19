@@ -2,7 +2,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 function TextInput({
     askQuestion,
-    inputRef
+    inputRef,
+    waitingAnswer
 }) {
     const [query, setQuery] = useState('');
 
@@ -39,8 +40,10 @@ function TextInput({
         <div className="flex w-full px-2">
             <img src="/image/logo.png" alt="logo" className="w-[30] ml-auto cursor-pointer"
                 onClick={() => {
-                    askQuestion(query);
-                    setQuery('');
+                    if (!waitingAnswer) {
+                        askQuestion(query);
+                        setQuery('');
+                    }
                 }} />
         </div>
     </div>

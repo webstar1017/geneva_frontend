@@ -16,6 +16,7 @@ import {
 import getCaretCoordinates from 'textarea-caret';
 import { useFingerprint } from "./FingerPrint";
 import toast from "react-hot-toast";
+import useIsMobile from "./useIsMobile";
 
 export default function BoomAggregator() {
   const fingerprint = useFingerprint();
@@ -34,11 +35,12 @@ export default function BoomAggregator() {
   const [hideSideBar, setHideSideBar] = useState(true);
   const [search, setSearch] = useState("");
   const scrollRef = useRef(null);
+  const isMobile = useIsMobile();
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
     let space = 30;
-    if(e.target.value == '') space += 15;
+    if (e.target.value == '') space += 15;
     const coords = getCaretCoordinates(e.target, 0);
     setIconOffset(coords.left - space); // `left` is x-coordinate of caret
   };
@@ -59,9 +61,9 @@ export default function BoomAggregator() {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/product-history/list`, {
       method: 'POST',
       headers: {
-          'Content-Type': 'application/json',
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({user_id: fingerprint})
+      body: JSON.stringify({ user_id: fingerprint })
     }).then((response) => {
       if (!response.ok) {
         throw new Error('error');
@@ -83,25 +85,25 @@ export default function BoomAggregator() {
       console.error(error);
     });
   }
-  
+
   const loadProduct = (query) => {
     if (controllerRef.current) {
       controllerRef.current.abort();
     }
-  
+
     const controller = new AbortController();
     controllerRef.current = controller;
-  
+
     setProducts([]);
     setWaitingAnswer(true);
-  
+
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/product/list`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       signal: controller.signal,
-      body: JSON.stringify({ category:  query}),
+      body: JSON.stringify({ category: query }),
     })
       .then((response) => {
         if (!response.ok) throw new Error('Fetch error');
@@ -121,18 +123,18 @@ export default function BoomAggregator() {
         }
       })
   }
-  
+
   const searchProduct = (search, type) => {
     if (controllerRef.current) {
       controllerRef.current.abort();
     }
-  
+
     const controller = new AbortController();
     controllerRef.current = controller;
-  
+
     setProducts([]);
     setWaitingAnswer(true);
-  
+
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/openai/product`, {
       method: 'POST',
       headers: {
@@ -181,19 +183,19 @@ export default function BoomAggregator() {
     setQuery(productHistory[index].query);
     setCategory('');
     const width = window.innerWidth;
-    if(width < 640) {
+    if (width < 640) {
       setHideSideBar(true);
     }
   }
 
   const deleteHistory = (index, user_id) => {
-    if(user_id == fingerprint) {
+    if (user_id == fingerprint) {
       fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/product-history/delete`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({user_id: fingerprint, id: index})
+        body: JSON.stringify({ user_id: fingerprint, id: index })
       }).then((response) => {
         if (!response.ok) {
           throw new Error('error');
@@ -228,12 +230,12 @@ export default function BoomAggregator() {
   }
   useEffect(() => {
     const width = window.innerWidth;
-    if(width > 640) {
+    if (width > 640) {
       setHideSideBar(false);
     }
     if (inputRef.current) {
       let space = 30;
-      if(inputRef.current.value == '') space += 35;
+      if (inputRef.current.value == '') space += 35;
       const coords = getCaretCoordinates(inputRef.current, 0);
       setIconOffset(coords.left - space);
       setIcon(true);
@@ -244,15 +246,15 @@ export default function BoomAggregator() {
   useEffect(() => {
     if (inputRef.current) {
       let space = 30;
-      if(inputRef.current.value == '') space += 35;
+      if (inputRef.current.value == '') space += 35;
       const coords = getCaretCoordinates(inputRef.current, 0);
       setIconOffset(coords.left - space);
       setIcon(true);
     }
-  },[query])
+  }, [query])
 
   useEffect(() => {
-    if(category) {
+    if (category) {
       setQuery('');
       loadProduct(category);
     }
@@ -272,9 +274,9 @@ export default function BoomAggregator() {
       )}
 
       {/* Sidebar */}
-      
-        <div ref={scrollRef}
-          className={`
+
+      <div ref={scrollRef}
+        className={`
             fixed top-0 left-0 z-50
             overflow-y-auto
             w-[300px] h-full  py-4 gap-3
@@ -282,7 +284,7 @@ export default function BoomAggregator() {
             transform transition-transform duration-300 ease-in-out
             ${hideSideBar ? '-translate-x-full' : 'translate-x-0'}
           `}
-        >
+      >
         <div className="flex flex-col items-center gap-3 overflow-y-auto">
           <div className="absolute top-0 right-0 px-2 pt-3 cursor-pointer" onClick={() => setHideSideBar(true)}>
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30]">
@@ -295,19 +297,10 @@ export default function BoomAggregator() {
             <span className="text-2xl font-semibold">Geneva</span>
           </div>
           <img src="/image/x.svg" alt="x" className="w-[24] cursor-pointer" />
-          <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={searchNew}/>
+          <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={searchNew} />
           <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" />
-          <div className="flex justify-between w-[80%]">
-            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
-              onClick={() => {
-                if (scrollRef.current) {
-                  scrollRef.current.scrollTo({
-                    top: 0,
-                    behavior: 'smooth',
-                  });
-                }
-              }}
-            />
+          <div align="center">
+
             <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"
               onClick={() => {
                 if (scrollRef.current) {
@@ -321,15 +314,15 @@ export default function BoomAggregator() {
           </div>
           <div className="w-[100%]" align="center">
             <input
-                className="border border-gray w-[80%] m-auto pl-6 pr-2"
-                placeholder="Search..."
-                value={search}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                }}
+              className="border border-gray w-[80%] m-auto pl-6 pr-2"
+              placeholder="Search..."
+              value={search}
+              onChange={(event) => {
+                setSearch(event.target.value);
+              }}
             />
             <div className="relative">
-              <img src="/image/search.png" width={15} style={{position: "absolute", left: "35px", top: " -20px"}}/>
+              <img src="/image/search.png" width={15} style={{ position: "absolute", left: "35px", top: " -20px" }} />
             </div>
           </div>
         </div>
@@ -351,7 +344,7 @@ export default function BoomAggregator() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <img
-                      src="/image/trash.svg" 
+                      src="/image/trash.svg"
                       onClick={(e) => e.stopPropagation()} // Prevent other click handlers
                       className="absolute w-[14px] right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
                     />
@@ -359,7 +352,7 @@ export default function BoomAggregator() {
                   <DialogContent className="bg-[url('/image/background-light.png')] dark:bg-[url('/image/background-dark.png')] bg-[length:100%_100%] bg-no-repeat bg-center border-none shadow-[10px_1px_20px_1px_black] px-0 rounded-4xl [&>button]:hidden font-goudy text-xl ring-0">
                     <DialogHeader className="items-center">
                       <DialogTitle className="text-xl">delete history?</DialogTitle>
-                      <hr className="mt-4 !border-[#D4F8E5] w-full"/>
+                      <hr className="mt-4 !border-[#D4F8E5] w-full" />
                     </DialogHeader>
                     <div className="justify-self-center">
                       this will delete the conversation & history
@@ -382,6 +375,18 @@ export default function BoomAggregator() {
             )
           })}
         </div>
+        <div align="center">
+          <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollTo({
+                  top: 0,
+                  behavior: 'smooth',
+                });
+              }
+            }}
+          />
+        </div>
       </div>
       <div
         className={`
@@ -393,23 +398,30 @@ export default function BoomAggregator() {
           ${hideSideBar ? 'ml-0' : 'ml-0 sm:ml-[300px]'}
         `}
       >
-        <header className="flex justify-between items-center p-2">
-          <div className="flex gap-3">
-            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30] self-start mt-1 cursor-pointer"
-                                 style={{color: theme === "light" ? "black" : "white"}}
-                                 onClick={() => setHideSideBar(false)}>
-              <path d="M20 7L4 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-              <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-              <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-            </svg>}
-            <div className="w-[60px] bg-black text-white text-center rounded-sm py-1 shadow-[2px_2px_2px_black] cursor-pointer" onClick={gotoBack}>
-              back
+        <header>
+          <div className="flex justify-between items-center p-2">
+            <div className="flex gap-3">
+              {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30] self-start mt-1 cursor-pointer"
+                style={{ color: theme === "light" ? "black" : "white" }}
+                onClick={() => setHideSideBar(false)}>
+                <path d="M20 7L4 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
+                <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
+                <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
+              </svg>}
+              <div className="w-[60px] bg-black text-white text-center rounded-sm py-1 shadow-[2px_2px_2px_black] cursor-pointer" onClick={gotoBack}>
+                back
+              </div>
             </div>
+            {
+              !isMobile && <span className="text-3xl underline decoration-[#189453] decoration-2 underline-offset-[10px] self-end text-center">Discover & Shop anything consumer. Powered by Boom.</span>
+            }
+            <img src="/image/boom.png" alt="x" className="w-[60] self-end cursor-pointer" />
           </div>
-          <span className="text-3xl underline decoration-[#189453] decoration-2 underline-offset-[10px] self-end text-center">Discover & Shop anything consumer. Powered by Boom.</span>
-          <img src="/image/boom.png" alt="x" className="w-[60] self-end cursor-pointer"/>
+          {
+            isMobile && <div className=" mt-[20px] text-3xl underline decoration-[#189453] decoration-2 underline-offset-[10px] self-end text-center" style={{ lineHeight: '70px' }}>Discover & Shop anything consumer. Powered by Boom.</div>
+          }
         </header>
-        <div className="flex mx-auto px-3 md:px-4 w-full py-6">
+        <div className="flex mx-auto px-3 md:px-4 w-full py-3">
           <div className="mx-auto flex flex-col flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl xl:max-w-[48rem] justify-center items-center">
             <div className="relative flex w-full pb-2 cursor-text flex-col items-center justify-center rounded-[20px] contain-inline-size">
               <div
@@ -430,7 +442,7 @@ export default function BoomAggregator() {
             </div>
           </div>
         </div>
-        <div className=" w-[90%] m-auto flex  justify-center md:justify-between lg:justify-between items-center text-2xl my-10" style={{flexWrap: "wrap", gap: "50px"}}>
+        <div className=" w-[90%] m-auto flex  justify-center md:justify-around lg:justify-around items-center text-2xl my-3" style={{ flexWrap: "wrap", gap: "25px" }}>
           <div className={`${category == 'footwear' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('footwear')}>footwear</div>
           <div className={`${category == 'beauty' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('beauty')}>beauty</div>
           <div className={`${category == 'clothing' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('clothing')}>clothing</div>
@@ -438,7 +450,7 @@ export default function BoomAggregator() {
           <div className={`${category == 'electronics' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('electronics')}>electronics</div>
           <div className={`${category == 'random' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('random')}>&  everything else</div>
         </div>
-        {waitingAnswer && 
+        {waitingAnswer &&
           <div className="flex flex-col flex-1 my-4">
             <div className="mx-10 py-4 flex text-2xl">
               <img src="/image/logo.png" alt="logo" className="w-[30] mr-2" />
@@ -521,14 +533,14 @@ export default function BoomAggregator() {
             {Array.isArray(products) && (
               (productType === 'specific' ? products.slice(1) : products)
                 .map((item, index) => (
-                    <ProductSlider
-                        key={index}
-                        linkToProduct={linkToProduct}
-                        image={item.image}
-                        thumbnails={item.thumbnails}
-                        url={item.url}
-                        price={item.price}
-                    />
+                  <ProductSlider
+                    key={index}
+                    linkToProduct={linkToProduct}
+                    image={item.image}
+                    thumbnails={item.thumbnails}
+                    url={item.url}
+                    price={item.price}
+                  />
                   // <div
                   //   key={index}
                   //   className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
@@ -552,53 +564,53 @@ export default function BoomAggregator() {
   );
 }
 
-function ProductSlider({image, thumbnails, url,linkToProduct, price, id}) {
+function ProductSlider({ image, thumbnails, url, linkToProduct, price, id }) {
   const [index, setIndex] = useState(0);
-  const {theme, setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
   return <div className="flex items-center gap-[15] align-center" id={id}>
     {
-        thumbnails && thumbnails.length > 1 &&
-        <div>
-          <img src={`/image/${theme == "light" ? "dark" : "white" }-left.png`} width={20} height={20}
-               onClick={() => {
-                 setIndex(prevIndex => (prevIndex + 1) % thumbnails.length);
-               }}
-               className="cursor-pointer"
-          />
-        </div>
+      thumbnails && thumbnails.length > 1 &&
+      <div>
+        <img src={`/image/${theme == "light" ? "dark" : "white"}-left.png`} width={20} height={20}
+          onClick={() => {
+            setIndex(prevIndex => (prevIndex + 1) % thumbnails.length);
+          }}
+          className="cursor-pointer"
+        />
+      </div>
     }
     <div
       className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
       onClick={() => linkToProduct(url)}
-  >
+    >
 
-    <div className="flex justify-center w-full">
-      {
+      <div className="flex justify-center w-full">
+        {
           thumbnails && thumbnails.length > 1 ?
-          <img
+            <img
               src={thumbnails[index]}
               alt="product"
               className="max-w-[200px] max-h-[200px] pt-3"
-          />:
-        <img
-          src={image}
-          alt="product"
-          className="max-w-[200px] max-h-[200px] pt-3"
-        />
-      }
+            /> :
+            <img
+              src={image}
+              alt="product"
+              className="max-w-[200px] max-h-[200px] pt-3"
+            />
+        }
+      </div>
+      <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{price}</div>
     </div>
-    <div className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{price}</div>
-  </div>
     {
-        thumbnails && thumbnails.length > 1 &&
-        <div>
-          <img src={`/image/${theme == "light" ? "dark" : "white" }-right.png`} width={20} height={20}
-               onClick={() => {
-                 setIndex(prevIndex => (prevIndex + 1) % thumbnails.length);
-               }}
-               className="cursor-pointer"
-          />
-        </div>
+      thumbnails && thumbnails.length > 1 &&
+      <div>
+        <img src={`/image/${theme == "light" ? "dark" : "white"}-right.png`} width={20} height={20}
+          onClick={() => {
+            setIndex(prevIndex => (prevIndex + 1) % thumbnails.length);
+          }}
+          className="cursor-pointer"
+        />
+      </div>
     }
   </div>
 }

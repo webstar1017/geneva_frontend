@@ -25,7 +25,7 @@ export function LLMAggregator() {
   ];
   const fingerprint = useFingerprint();
   const router = useRouter();
-  const {theme, setTheme} = useTheme()
+  const { theme, setTheme } = useTheme()
   const [waitingAnswer, setWaitingAnswer] = useState(false);
   const [chatHistory, setChatHistory] = useState([]);
   const [filterList, setFilterList] = useState([]);
@@ -49,7 +49,7 @@ export function LLMAggregator() {
     setWaitingAnswer(true);
 
     abortControllerRef.current = new AbortController();
-    const {signal} = abortControllerRef.current;
+    const { signal } = abortControllerRef.current;
 
     if (!chat_id) chat_id = Math.floor(Date.now() / 1000);
     setChatHistory((prevList) => [...prevList, {
@@ -58,14 +58,14 @@ export function LLMAggregator() {
       text: question,
       level: 'question'
     }]);
-    setFilterList((prevList) => [...prevList, {type: 'question', chat_id: chat_id, text: question, level: 'question'}]);
+    setFilterList((prevList) => [...prevList, { type: 'question', chat_id: chat_id, text: question, level: 'question' }]);
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/openai/ask`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       signal: signal,
-      body: JSON.stringify({user_id: fingerprint, chat_id: chat_id, question: question, history: history})
+      body: JSON.stringify({ user_id: fingerprint, chat_id: chat_id, question: question, history: history })
     }).then((response) => {
       // if (!response.ok) {
       //   throw new Error('error');
@@ -158,14 +158,14 @@ export function LLMAggregator() {
           text: question
         }]);
       }
-      
+
     }).catch((error) => {
       console.error(error);
       setWaitingAnswer(false);
     });
   }
 
-  
+
 
   const changeTheme = () => {
     // setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -179,7 +179,7 @@ export function LLMAggregator() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({user_id: fingerprint,})
+      body: JSON.stringify({ user_id: fingerprint, })
     }).then((response) => {
       if (!response.ok) {
         throw new Error('error');
@@ -243,16 +243,16 @@ export function LLMAggregator() {
       if (history.length > 0) {
         const lastChat = Math.max(...history.map(chat => chat.chat_id));
         const filteredList = history
-            .filter(chat => chat.chat_id == lastChat)
-            .map(chat => ({
-              ...chat,
-              verify_top_open: false,
-              verify_bottom_open: false
-            }));
+          .filter(chat => chat.chat_id == lastChat)
+          .map(chat => ({
+            ...chat,
+            verify_top_open: false,
+            verify_bottom_open: false
+          }));
         setFilterList(filteredList)
         const list = history.filter(
-            (chat, index, self) =>
-                self.findIndex(c => c.chat_id === chat.chat_id) === index
+          (chat, index, self) =>
+            self.findIndex(c => c.chat_id === chat.chat_id) === index
         );
         setChatList(list);
         localStorage.setItem('chat_id', lastChat);
@@ -266,12 +266,12 @@ export function LLMAggregator() {
 
   const changeChatId = (id) => {
     const filteredList = chatHistory
-        .filter(chat => chat.chat_id == id)
-        .map(chat => ({
-          ...chat,
-          verify_top_open: false,
-          verify_bottom_open: false
-        }));
+      .filter(chat => chat.chat_id == id)
+      .map(chat => ({
+        ...chat,
+        verify_top_open: false,
+        verify_bottom_open: false
+      }));
     setFilterList(filteredList)
     localStorage.setItem('chat_id', id);
     const width = window.innerWidth;
@@ -295,7 +295,7 @@ export function LLMAggregator() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({user_id: fingerprint, chat_id: id})
+        body: JSON.stringify({ user_id: fingerprint, chat_id: id })
       }).then((response) => {
         if (!response.ok) {
           throw new Error('error');
@@ -329,20 +329,20 @@ export function LLMAggregator() {
   }, [fingerprint]);
 
   useEffect(() => {
-    waitingRef.current?.scrollIntoView({behavior: "smooth"});
+    waitingRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [filterList])
 
   return (
-      <div className="flex h-screen font-goudy">
-        {!hideSideBar && (
-            <div
-                className="fixed sm:hidden inset-0 bg-black/50 z-40"
-                onClick={() => setHideSideBar(true)}
-            />
-        )}
-        {/* Sidebar */}
-        <div ref={scrollRef}
-             className={`
+    <div className="flex h-screen font-goudy">
+      {!hideSideBar && (
+        <div
+          className="fixed sm:hidden inset-0 bg-black/50 z-40"
+          onClick={() => setHideSideBar(true)}
+        />
+      )}
+      {/* Sidebar */}
+      <div ref={scrollRef}
+        className={`
             fixed top-0 left-0 z-50
             overflow-y-auto
             w-[300px] h-full py-4 gap-3
@@ -350,210 +350,212 @@ export function LLMAggregator() {
             transform transition-transform duration-300 ease-in-out
             ${hideSideBar ? '-translate-x-full' : 'translate-x-0'}
           `}
-        >
-          <div className="flex flex-col items-center gap-3 overflow-y-auto">
-            <div className="absolute top-0 right-0 px-2 pt-3 cursor-pointer" onClick={() => setHideSideBar(true)}>
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30]">
-                <path d="M13 19L7 12L13 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
-                      strokeLinejoin="round"></path>
-                <path opacity="0.5" d="M16.9998 19L10.9998 12L16.9998 5" stroke="currentColor" strokeWidth="1.5"
-                      strokeLinecap="round" strokeLinejoin="round"></path>
-              </svg>
-            </div>
-            <div className="text-center flex flex-col gap-2">
-              <img src="/image/logo.png" alt="logo" className="w-[80] mx-auto"/>
-              <span className="text-2xl font-semibold">Geneva</span>
-            </div>
-            <img src="/image/x.svg" alt="x" className="w-[24] cursor-pointer"/>
-            <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={addNewChatId}/>
-            <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" onClick={addNewChatId}/>
-            <div className="flex justify-between w-[80%]">
-              <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
-                   onClick={() => {
-                     if (scrollRef.current) {
-                       scrollRef.current.scrollTo({
-                         top: 0,
-                         behavior: 'smooth',
-                       });
-                     }
-                   }}
-              />
-              <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"
-                   onClick={() => {
-                     if (scrollRef.current) {
-                       scrollRef.current.scrollTo({
-                         top: scrollRef.current.scrollHeight,
-                         behavior: 'smooth',
-                       });
-                     }
-                   }}
-              />
-            </div>
-            <div className="w-[100%]" align="center">
-              <LLMTitleSearch 
-                setSearch={setSearch}
-              />
-              <div className="relative">
-                <img src="/image/search.png" width={15} style={{position: "absolute", left: "35px", top: " -20px"}}/>
-              </div>
+      >
+        <div className="flex flex-col items-center gap-3 overflow-y-auto">
+          <div className="absolute top-0 right-0 px-2 pt-3 cursor-pointer" onClick={() => setHideSideBar(true)}>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-[30]">
+              <path d="M13 19L7 12L13 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"
+                strokeLinejoin="round"></path>
+              <path opacity="0.5" d="M16.9998 19L10.9998 12L16.9998 5" stroke="currentColor" strokeWidth="1.5"
+                strokeLinecap="round" strokeLinejoin="round"></path>
+            </svg>
+          </div>
+          <div className="text-center flex flex-col gap-2">
+            <img src="/image/logo.png" alt="logo" className="w-[80] mx-auto" />
+            <span className="text-2xl font-semibold">Geneva</span>
+          </div>
+          <img src="/image/x.svg" alt="x" className="w-[24] cursor-pointer" />
+          <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={addNewChatId} />
+          <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" onClick={addNewChatId} />
+          <div align="center">
+            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
+              onClick={() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                  });
+                }
+              }}
+            />
+          </div>
+          <div className="w-[100%]" align="center">
+            <LLMTitleSearch
+              setSearch={setSearch}
+            />
+            <div className="relative">
+              <img src="/image/search.png" width={15} style={{ position: "absolute", left: "35px", top: " -20px" }} />
             </div>
           </div>
-          <div className="w-full px-4 gap-2 flex flex-col mt-5">
-            {chatList.filter((item) => item.text.indexOf(search) > -1).map((item, index) => {
-              return (
-                  <div key={index} className="relative group w-full">
-                    <Button
-                        key={index}
-                        className="w-full bg-[#DCEAF7] hover:bg-[#DCEAF7] text-black overflow-hidden"
-                        onClick={() => changeChatId(item.chat_id)}
-                    >
+        </div>
+        <div className="w-full px-4 gap-2 flex flex-col mt-5">
+          {chatList.filter((item) => item.text.indexOf(search) > -1).map((item, index) => {
+            return (
+              <div key={index} className="relative group w-full">
+                <Button
+                  key={index}
+                  className="w-full bg-[#DCEAF7] hover:bg-[#DCEAF7] text-black overflow-hidden"
+                  onClick={() => changeChatId(item.chat_id)}
+                >
                   <span className="block text-center text-xl truncate mx-5">
                     {item.text}
                   </span>
-                    </Button>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <img
-                            src="/image/trash.svg"
-                            onClick={(e) => e.stopPropagation()} // Prevent other click handlers
-                            className="absolute w-[14px] right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
-                        />
-                      </DialogTrigger>
-                      <DialogContent
-                          className="bg-[length:100%_100%] bg-no-repeat bg-center border-none shadow-[10px_1px_20px_1px_black] px-0 rounded-4xl [&>button]:hidden font-goudy text-xl ring-0">
-                        <DialogHeader className="items-center">
-                          <DialogTitle className="text-xl">delete chat?</DialogTitle>
-                          <hr className="mt-4 !border-[#D4F8E5] w-full"/>
-                        </DialogHeader>
-                        <div className="justify-self-center">
-                          this will delete the conversation & history
+                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <img
+                      src="/image/trash.svg"
+                      onClick={(e) => e.stopPropagation()} // Prevent other click handlers
+                      className="absolute w-[14px] right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                    />
+                  </DialogTrigger>
+                  <DialogContent
+                    className="bg-[length:100%_100%] bg-no-repeat bg-center border-none shadow-[10px_1px_20px_1px_black] px-0 rounded-4xl [&>button]:hidden font-goudy text-xl ring-0">
+                    <DialogHeader className="items-center">
+                      <DialogTitle className="text-xl">delete chat?</DialogTitle>
+                      <hr className="mt-4 !border-[#D4F8E5] w-full" />
+                    </DialogHeader>
+                    <div className="justify-self-center">
+                      this will delete the conversation & history
+                    </div>
+                    <DialogFooter className="gap-20 flex !justify-center">
+                      <DialogClose asChild>
+                        <div
+                          className="bg-white text-black w-[60px] hover:bg-black hover:text-white text-center rounded-sm py-1 shadow-[2px_2px_2px_black] cursor-pointer">
+                          back
                         </div>
-                        <DialogFooter className="gap-20 flex !justify-center">
-                          <DialogClose asChild>
-                            <div
-                                className="bg-white text-black w-[60px] hover:bg-black hover:text-white text-center rounded-sm py-1 shadow-[2px_2px_2px_black] cursor-pointer">
-                              back
-                            </div>
-                          </DialogClose>
-                          <DialogClose>
-                            <div
-                                className="bg-white text-black w-[60px] hover:bg-black hover:text-white text-center rounded-sm py-1 shadow-[2px_2px_2px_black] cursor-pointer"
-                                onClick={() => deleteChatHistory(item.chat_id, item.user_id)}>
-                              yes
-                            </div>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-              )
-            })}
-          </div>
+                      </DialogClose>
+                      <DialogClose>
+                        <div
+                          className="bg-white text-black w-[60px] hover:bg-black hover:text-white text-center rounded-sm py-1 shadow-[2px_2px_2px_black] cursor-pointer"
+                          onClick={() => deleteChatHistory(item.chat_id, item.user_id)}>
+                          yes
+                        </div>
+                      </DialogClose>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )
+          })}
         </div>
-        <div
-            style={{
-              background: `url(/image/background-${theme}${isMobile ? "-mobile" : ""}.png)`,
-            }}
-            className={`
+        <div align="center">
+          <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollTo({
+                  top: scrollRef.current.scrollHeight,
+                  behavior: 'smooth',
+                });
+              }
+            }} />
+        </div>
+
+      </div>
+      <div
+        style={{
+          background: `url(/image/background-${theme}${isMobile ? "-mobile" : ""}.png)`,
+        }}
+        className={`
           background-image
           flex-1 flex flex-col
           transition-all duration-300 ease-in-out
           ${hideSideBar ? 'ml-0' : 'ml-0 sm:ml-[300px]'}
         `}
-        >
-          <header className="flex justify-between items-center px-8 py-2">
-            <div className="flex gap-3">
-              {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
-                                   style={{color: theme === "light" ? "black" : "white"}}
-                                   className="w-[30] self-start mt-1 cursor-pointer"
-                                   onClick={() => setHideSideBar(false)}>
-                <path d="M20 7L4 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-                <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" strokeWidth="1.5"
-                      strokeLinecap="round"></path>
-                <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
-              </svg>}
-              <div className="flex flex-col gap-4">
-                <p className="underline decoration-[#D4F8E5] decoration-2 underline-offset-[10px] text-2xl cursor-pointer"
-                   style={{color: theme === "light" ? "black" : "white"}}
-                   onClick={() => router.push('/marketplace')}>marketplace</p>
-                <img src="/image/boom.png" alt="x" className="w-[20] self-end cursor-pointer"
-                     onClick={() => router.push('/marketplace')}/>
-              </div>
+      >
+        <header className="flex justify-between items-center px-8 py-2">
+          <div className="flex gap-3">
+            {hideSideBar && <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+              style={{ color: theme === "light" ? "black" : "white" }}
+              className="w-[30] self-start mt-1 cursor-pointer"
+              onClick={() => setHideSideBar(false)}>
+              <path d="M20 7L4 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
+              <path opacity="0.5" d="M20 12L4 12" stroke="currentColor" strokeWidth="1.5"
+                strokeLinecap="round"></path>
+              <path d="M20 17L4 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"></path>
+            </svg>}
+            <div className="flex flex-col gap-4">
+              <p className="underline decoration-[#D4F8E5] decoration-2 underline-offset-[10px] text-2xl cursor-pointer"
+                style={{ color: theme === "light" ? "black" : "white" }}
+                onClick={() => router.push('/marketplace')}>marketplace</p>
+              <img src="/image/boom.png" alt="x" className="w-[20] self-end cursor-pointer"
+                onClick={() => router.push('/marketplace')} />
             </div>
-            <img
-                src="/image/theme.png"
-                alt="theme"
-                onClick={changeTheme}
-                className="w-[40] h-auto scale-x-[-1] cursor-pointer"
-            />
-          </header>
-          <Playground
-            theme={theme}
-            filterList={filterList} 
-            waitingAnswer={waitingAnswer}
-            setFilterList={setFilterList}
-            inputRef={inputRef}
-            askQuestion={askQuestion}
-            waitingRef={waitingRef}
+          </div>
+          <img
+            src="/image/theme.png"
+            alt="theme"
+            onClick={changeTheme}
+            className="w-[40] h-auto scale-x-[-1] cursor-pointer"
           />
-        </div>
+        </header>
+        <Playground
+          theme={theme}
+          filterList={filterList}
+          waitingAnswer={waitingAnswer}
+          setFilterList={setFilterList}
+          inputRef={inputRef}
+          askQuestion={askQuestion}
+          waitingRef={waitingRef}
+        />
       </div>
+    </div>
   );
 }
 
-function ProductSlider({data, linkToProduct, id, product}) {
+function ProductSlider({ data, linkToProduct, id, product }) {
   const [index, setIndex] = useState(0);
   return <div
     className="flex align-center gap-[15] items-center"
   >
     {
       data.thumbnails && data.thumbnails.length > 1 &&
-        <div>
-          <img src={`/image/dark-left.png`} width={20} height={20}
-               onClick={() => {
-                 setIndex(prevIndex => (prevIndex + 1) % data.thumbnails.length);
-               }}
-               className="cursor-pointer"
-          />
-        </div>
+      <div>
+        <img src={`/image/dark-left.png`} width={20} height={20}
+          onClick={() => {
+            setIndex(prevIndex => (prevIndex + 1) % data.thumbnails.length);
+          }}
+          className="cursor-pointer"
+        />
+      </div>
     }
     <div
       key={id}
       className="bg-white w-[200px] shadow-[10px_10px_20px_1px_black] rounded-[20px] overflow-hidden flex flex-col items-center cursor-pointer"
       onClick={() => linkToProduct(product.url)}
-  >
-    <div
+    >
+      <div
         className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.title}</div>
-    <div className="flex justify-center w-full">
-      {
-        data.thumbnails && data.thumbnails.length > 1 ?
+      <div className="flex justify-center w-full">
+        {
+          data.thumbnails && data.thumbnails.length > 1 ?
             <div className="flex gap-[15] align-center">
               <img
-                  src={data.thumbnails[index]}
-                  alt="product"
-                  className="max-w-[200px] max-h-[200px] pt-3"
+                src={data.thumbnails[index]}
+                alt="product"
+                className="max-w-[200px] max-h-[200px] pt-3"
               />
             </div> :
             <img
-                src={data.main}
-                alt="product"
-                className="max-w-[200px] max-h-[200px] pt-3"
+              src={data.main}
+              alt="product"
+              className="max-w-[200px] max-h-[200px] pt-3"
             />
-      }
-    </div>
-    <div
+        }
+      </div>
+      <div
         className="text-xl py-3 mb-0 mt-auto pl-3 w-full font-aptos">{product.price}</div>
     </div>
-      {
-          data.thumbnails && data.thumbnails.length > 1 &&
-          <div>
-            <img src={`/image/dark-right.png`} width={20} height={20}
-                 className="cursor-pointer"
-                 onClick={() => {
-                   setIndex(prevIndex => (prevIndex - 1) % data.thumbnails.length);
-                 }}
-            />
-          </div>
-      }
-    </div>
+    {
+      data.thumbnails && data.thumbnails.length > 1 &&
+      <div>
+        <img src={`/image/dark-right.png`} width={20} height={20}
+          className="cursor-pointer"
+          onClick={() => {
+            setIndex(prevIndex => (prevIndex - 1) % data.thumbnails.length);
+          }}
+        />
+      </div>
+    }
+  </div>
 }

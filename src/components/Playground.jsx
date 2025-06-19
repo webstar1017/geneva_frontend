@@ -429,6 +429,7 @@ function Playground({
                 <TextInput 
                     askQuestion={askQuestion}
                     inputRef={inputRef}
+                    waitingAnswer={waitingAnswer}
                 />
             </div>
         </div>
