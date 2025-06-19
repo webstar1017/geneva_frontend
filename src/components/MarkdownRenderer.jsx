@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -9,7 +9,7 @@ import remarkGfm from "remark-gfm";
 
 const CodeBlock = ({ language, children }) => {
   const [copied, setCopied] = useState(false);
-
+  const [isClient, setIsClient] = useState(false);
   const handleCopy = () => {
     navigator.clipboard.writeText(children).then(() => {
       setCopied(true);
@@ -17,8 +17,12 @@ const CodeBlock = ({ language, children }) => {
     });
   };
 
+  useEffect(() => {
+    setIsClient(true);
+  }, [])
+
   return (
-    <div className="relative bg-[#282C34] text-white rounded-lg overflow-hidden my-4">
+    isClient && <div className="relative bg-[#282C34] text-white rounded-lg overflow-hidden my-4">
       {/* Header with Copy Button */}
       <div className="flex justify-between items-center bg-gray-800 px-4 py-2 text-sm font-mono">
         <span className="text-gray-300">{language || "plaintext"}</span>

@@ -15,6 +15,7 @@ import {
 import { useFingerprint } from "./FingerPrint";
 import useIsMobile from "@/components/useIsMobile";
 import Playground from "./Playground";
+import LLMTitleSearch from "./LLMTitleSearch";
 
 export function LLMAggregator() {
   const themes = [
@@ -35,6 +36,7 @@ export function LLMAggregator() {
   const inputRef = useRef(null);
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const scrollRef = useRef(null);
 
 
@@ -387,13 +389,8 @@ export function LLMAggregator() {
               />
             </div>
             <div className="w-[100%]" align="center">
-              <input
-                  className="border border-gray w-[80%] m-auto pl-6 pr-2"
-                  placeholder="Search..."
-                  value={search}
-                  onChange={(event) => {
-                    setSearch(event.target.value);
-                  }}
+              <LLMTitleSearch 
+                setSearch={setSearch}
               />
               <div className="relative">
                 <img src="/image/search.png" width={15} style={{position: "absolute", left: "35px", top: " -20px"}}/>

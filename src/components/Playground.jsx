@@ -2,6 +2,7 @@ import MarkdownRenderer from "./MarkdownRenderer";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import toast from 'react-hot-toast';
+import TextInput from "./TextInput";
 
 function Playground({
     filterList,
@@ -421,26 +422,10 @@ function Playground({
                         >We intelligently unify AIs to give you high-quality, trusted answers & smarter discovery</span>
                     </div>
                 )}
-                <div
-                    className="flex w-full pb-2 cursor-text flex-col items-center justify-center rounded-[20px] border border-[#F1E2FA] contain-inline-size overflow-clip bg-white dark:bg-black shadow-[10px_1px_20px_1px_black]">
-                    <Textarea
-                        ref={inputRef}
-                        className="resize-none max-h-48 overflow-auto !border-none focus-visible:ring-0 !
-                none ml-2 !min-h-8 bg-white dark:bg-black !text-xl"
-                        value={query}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyDown}
-                        rows="1" // Initially set to 1 row
-                        placeholder="Ask Geneva anything"
-                    />
-                    <div className="flex w-full px-2">
-                        <img src="/image/logo.png" alt="logo" className="w-[30] ml-auto cursor-pointer"
-                            onClick={() => {
-                                askQuestion(query);
-                                setQuery('');
-                            }} />
-                    </div>
-                </div>
+                <TextInput 
+                    askQuestion={askQuestion}
+                    inputRef={inputRef}
+                />
             </div>
         </div>
     </div>

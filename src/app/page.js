@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useFingerprint } from "@/components/FingerPrint";
 import toast from 'react-hot-toast';
@@ -8,8 +8,9 @@ import toast from 'react-hot-toast';
 export default function Home() {
   const fingerprint = useFingerprint();
   const router = useRouter();
-
+  const [isClient, setIsClient] = useState(false);
   useEffect(() => {
+    setIsClient(true);
     const auth = async () => {
       if (!fingerprint) return;
 
@@ -30,7 +31,7 @@ export default function Home() {
   }, [fingerprint]);
 
   return (
-    <div className="relative bg-[url('/image/background-light.png')] bg-[length:100%_100%] bg-no-repeat bg-center">
+    isClient && <div className="relative bg-[url('/image/background-light.png')] bg-[length:100%_100%] bg-no-repeat bg-center">
     </div>
   )
 }
