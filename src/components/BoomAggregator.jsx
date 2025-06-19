@@ -522,6 +522,7 @@ export default function BoomAggregator() {
               (productType === 'specific' ? products.slice(1) : products)
                 .map((item, index) => (
                     <ProductSlider
+                        key={index}
                         linkToProduct={linkToProduct}
                         image={item.image}
                         thumbnails={item.thumbnails}
@@ -556,7 +557,7 @@ function ProductSlider({image, thumbnails, url,linkToProduct, price, id}) {
   const {theme, setTheme} = useTheme();
   return <div className="flex items-center gap-[15] align-center" id={id}>
     {
-        thumbnails && thumbnails.length > 0 &&
+        thumbnails && thumbnails.length > 1 &&
         <div>
           <img src={`/image/${theme == "light" ? "dark" : "white" }-left.png`} width={20} height={20}
                onClick={() => {
