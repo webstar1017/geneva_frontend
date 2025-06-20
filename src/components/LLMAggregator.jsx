@@ -367,18 +367,18 @@ export function LLMAggregator() {
           <img src="/image/x.svg" alt="x" className="w-[24] cursor-pointer" />
           <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={addNewChatId} />
           <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" onClick={addNewChatId} />
+          
           <div align="center">
-            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
-              onClick={() => {
-                if (scrollRef.current) {
-                  scrollRef.current.scrollTo({
-                    top: 0,
-                    behavior: 'smooth',
-                  });
-                }
-              }}
-            />
-          </div>
+          <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"
+            onClick={() => {
+              if (scrollRef.current) {
+                scrollRef.current.scrollTo({
+                  top: scrollRef.current.scrollHeight,
+                  behavior: 'smooth',
+                });
+              }
+            }} />
+        </div>
           <div className="w-[100%]" align="center">
             <LLMTitleSearch
               setSearch={setSearch}
@@ -440,16 +440,17 @@ export function LLMAggregator() {
           })}
         </div>
         <div align="center">
-          <img src="/image/bottom-button.png" className="w-[50px] cursor-pointer"
-            onClick={() => {
-              if (scrollRef.current) {
-                scrollRef.current.scrollTo({
-                  top: scrollRef.current.scrollHeight,
-                  behavior: 'smooth',
-                });
-              }
-            }} />
-        </div>
+            <img src="/image/top-button.png" className="w-[40px] cursor-pointer"
+              onClick={() => {
+                if (scrollRef.current) {
+                  scrollRef.current.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                  });
+                }
+              }}
+            />
+          </div>
 
       </div>
       <div
