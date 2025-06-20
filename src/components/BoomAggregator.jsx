@@ -46,7 +46,7 @@ export default function BoomAggregator() {
       body: JSON.stringify({ user_id: fingerprint })
     }).then((response) => {
       if (!response.ok) {
-        throw new Error('error');
+        return false
       }
       return response.json();
     }).then((response) => {

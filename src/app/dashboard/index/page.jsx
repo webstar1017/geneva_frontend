@@ -22,11 +22,11 @@ function Dashboard() {
                 'Content-Type': 'application/json',
             }
         }).then((response) => {
-            return false;
-            // if (!response.ok) {
-            //     throw new Error('error');
-            // }
-            // return response.json();
+            if (!response.ok) {
+                // throw new Error('error');
+                return false;
+            }
+            return response.json();
         }).then((response) => {
             if (!response) return;
             setData(response);

@@ -67,10 +67,10 @@ export function LLMAggregator() {
       signal: signal,
       body: JSON.stringify({ user_id: fingerprint, chat_id: chat_id, question: question, history: history })
     }).then((response) => {
-      // if (!response.ok) {
-      //   throw new Error('error');
-      // }
-      return false;
+      if (!response.ok) {
+       return false;
+      }
+      return response.json();
     }).then((response) => {
       setWaitingAnswer(false);
       if (!response) return;
@@ -182,7 +182,7 @@ export function LLMAggregator() {
       body: JSON.stringify({ user_id: fingerprint, })
     }).then((response) => {
       if (!response.ok) {
-        throw new Error('error');
+        return false;
       }
       return response.json();
     }).then((response) => {
@@ -298,7 +298,7 @@ export function LLMAggregator() {
         body: JSON.stringify({ user_id: fingerprint, chat_id: id })
       }).then((response) => {
         if (!response.ok) {
-          throw new Error('error');
+          return false;
         }
         return response.json();
       }).then((response) => {
@@ -313,7 +313,6 @@ export function LLMAggregator() {
       toast.error(`You don't have permission`);
     }
   }
-
   useEffect(() => {
     const width = window.innerWidth;
     if (width > 640) {
