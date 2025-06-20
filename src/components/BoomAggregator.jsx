@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from 'next-themes'
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +16,7 @@ import getCaretCoordinates from 'textarea-caret';
 import { useFingerprint } from "./FingerPrint";
 import toast from "react-hot-toast";
 import useIsMobile from "./useIsMobile";
+import BoomSearchInput from "./BoomSearchInput";
 
 export default function BoomAggregator() {
   const fingerprint = useFingerprint();
@@ -24,7 +24,6 @@ export default function BoomAggregator() {
   const inputRef = useRef(null);
   const controllerRef = useRef(null);
   const { theme, setTheme } = useTheme()
-  const [iconOffset, setIconOffset] = useState(8);
   const [query, setQuery] = useState('');
   const [waitingAnswer, setWaitingAnswer] = useState(false);
   const [products, setProducts] = useState([]);
@@ -36,26 +35,7 @@ export default function BoomAggregator() {
   const [search, setSearch] = useState("");
   const scrollRef = useRef(null);
   const isMobile = useIsMobile();
-
-  const handleInputChange = (e) => {
-    setQuery(e.target.value);
-    let space = 30;
-    if (e.target.value == '') space += 15;
-    const coords = getCaretCoordinates(e.target, 0);
-    setIconOffset(coords.left - space); // `left` is x-coordinate of caret
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      if (e.shiftKey) {
-        console.log('Shift + Enter pressed');
-      } else {
-        e.preventDefault();
-        setCategory('');
-        searchProduct(query, 'search');
-      }
-    }
-  };
+  const [iconOffset, setIconOffset] = useState(8);
 
   const loadProductHistory = () => {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/product-history/list`, {
@@ -153,7 +133,7 @@ export default function BoomAggregator() {
         if (type === 'search') {
           setProductHistory((prev) => [
             ...prev,
-            { user_id: fingerprint, id: response.id, query: query, products: response.products, product_type: response.product_type },
+            { user_id: fingerprint, id: response.id, query: search, products: response.products, product_type: response.product_type },
           ]);
         }
         setWaitingAnswer(false);
@@ -233,24 +213,10 @@ export default function BoomAggregator() {
     if (width > 640) {
       setHideSideBar(false);
     }
-    if (inputRef.current) {
-      let space = 30;
-      if (inputRef.current.value == '') space += 35;
-      const coords = getCaretCoordinates(inputRef.current, 0);
-      setIconOffset(coords.left - space);
-      setIcon(true);
-    }
     setTheme('light');
   }, [])
 
   useEffect(() => {
-    if (inputRef.current) {
-      let space = 30;
-      if (inputRef.current.value == '') space += 35;
-      const coords = getCaretCoordinates(inputRef.current, 0);
-      setIconOffset(coords.left - space);
-      setIcon(true);
-    }
   }, [query])
 
   useEffect(() => {
@@ -421,27 +387,15 @@ export default function BoomAggregator() {
             isMobile && <div className=" mt-[20px] text-3xl underline decoration-[#189453] decoration-2 underline-offset-[10px] self-end text-center" style={{ lineHeight: '70px' }}>Discover & Shop anything consumer. Powered by Boom.</div>
           }
         </header>
-        <div className="flex mx-auto px-3 md:px-4 w-full py-3">
-          <div className="mx-auto flex flex-col flex-1 gap-4 md:gap-5 lg:gap-6 md:max-w-3xl xl:max-w-[48rem] justify-center items-center">
-            <div className="relative flex w-full pb-2 cursor-text flex-col items-center justify-center rounded-[20px] contain-inline-size">
-              <div
-                className="absolute inset-y-0 flex pointer-events-none self-start mt-3"
-                style={{ left: `${iconOffset}px` }}
-              >
-                {icon && <img src="/image/search.png" alt="logo" className="w-[20] ml-auto" />}
-              </div>
-              <Textarea
-                ref={inputRef}
-                value={query}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                className="resize-none max-h-48 overflow-auto !border-none focus-visible:ring-0 !shadow-none !text-xl text-center"
-                rows="1"
-                placeholder="Search ..."
-              />
-            </div>
-          </div>
-        </div>
+          
+        <BoomSearchInput 
+          searchProduct={searchProduct}
+          setCategory={setCategory}
+          inputRef={inputRef}
+          icon={icon}
+          setIcon={setIcon}
+          defaultQuery={query}
+        />
         <div className=" w-[90%] m-auto flex  justify-center md:justify-around lg:justify-around items-center text-2xl my-3" style={{ flexWrap: "wrap", gap: "25px" }}>
           <div className={`${category == 'footwear' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('footwear')}>footwear</div>
           <div className={`${category == 'beauty' ? 'underline decoration-[#189453] decoration-2 underline-offset-[10px]' : ''} cursor-pointer`} onClick={() => setCategory('beauty')}>beauty</div>
