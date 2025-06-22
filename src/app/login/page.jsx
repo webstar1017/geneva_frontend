@@ -100,7 +100,6 @@ const Login = () => {
           <img src="/image/logo.png" alt="logo" className="w-[60] mx-auto" />
           <p className="text-2xl font-semibold">Geneva</p>
         </div>
-        <img src="/image/x.svg" alt="x" className="w-[24]" />
       </div>
       <div
         className={`

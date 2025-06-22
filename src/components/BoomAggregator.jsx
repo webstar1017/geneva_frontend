@@ -262,7 +262,6 @@ export default function BoomAggregator() {
             <img src="/image/logo.png" alt="logo" className="w-[80] mx-auto" />
             <span className="text-2xl font-semibold">Geneva</span>
           </div>
-          <img src="/image/x.svg" alt="x" className="w-[24] cursor-pointer" />
           <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={searchNew} />
           <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" />
           <div align="center">
