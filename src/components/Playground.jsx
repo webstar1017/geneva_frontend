@@ -1,8 +1,8 @@
 import MarkdownRenderer from "./MarkdownRenderer";
-import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import toast from 'react-hot-toast';
 import TextInput from "./TextInput";
+import {useRouter} from "next/navigation";
 
 function Playground({
     filterList,
@@ -14,7 +14,7 @@ function Playground({
     waitingRef
 }) {
     const [query, setQuery] = useState('');
-
+    const router = useRouter();
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             if (e.shiftKey) {
@@ -280,7 +280,7 @@ function Playground({
                 } else if (item.type == "general_product") {
                     return (
                         <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
-                            <div className="px-8 text-2xl mb-4 dark:text-white">
+                            <div className="px-8 text-2xl mb-4 dark:text-white" style={{ color: theme === "light" ? "dark" : "white" }}>
                                 Certainly! Here are some options picked for you
                             </div>
                             <div
@@ -305,7 +305,7 @@ function Playground({
                                 })
                                 }
                             </div>
-                            <div className="px-8 text-2xl mt-4 dark:text-white">
+                            <div className="px-8 text-2xl mt-4 dark:text-white" style={{ color: theme === "light" ? "dark" : "white" }}>
                                 You can also browse & shop from the Boom Marketplace <a link='#'
                                     className="underline cursor-pointer"
                                     onClick={() => router.push('/marketplace')}>here</a>

@@ -16,6 +16,7 @@ import { useFingerprint } from "./FingerPrint";
 import useIsMobile from "@/components/useIsMobile";
 import Playground from "./Playground";
 import LLMTitleSearch from "./LLMTitleSearch";
+import toast from "react-hot-toast";
 
 export function LLMAggregator() {
   const themes = [
