@@ -9,7 +9,8 @@ import toast from 'react-hot-toast';
 const Dashboard = () => {
   const router = useRouter();
   const fingerprint = useFingerprint();
-  const [verified, setVerified] = useState(false);
+  const [verified, setVerified] = useState(true);
+  const [isClient, setIsClient] = useState(false);
   useEffect(() => {
     const auth = async () => {
       if (!fingerprint) return;
@@ -27,9 +28,10 @@ const Dashboard = () => {
       }
     };
     auth();
+    setIsClient(true);
   }, [fingerprint])
   return (
-    verified && <LLMAggregator/>
+    isClient && verified && <LLMAggregator/>
   )
 }
 

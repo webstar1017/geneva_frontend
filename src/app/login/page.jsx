@@ -15,6 +15,7 @@ const Login = () => {
   const [verified, setVerified] = useState(true);
   const [hideSideBar, setHideSideBar] = useState(true);
   const { theme, setTheme } = useTheme();
+  const [isClient, setIsClient] = useState(false);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -61,7 +62,7 @@ const Login = () => {
         setVerified(false);
       }
     };
-
+    setIsClient(true);
     auth();
   }, [fingerprint])
 
@@ -73,7 +74,7 @@ const Login = () => {
   }, [])
 
   return (
-    !verified && <div className="flex h-screen">
+    !verified && isClient && <div className="flex h-screen">
       {!hideSideBar && (
         <div
           className="fixed sm:hidden inset-0 bg-black/50 z-40"
