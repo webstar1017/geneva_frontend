@@ -287,7 +287,7 @@ export default function BoomAggregator() {
               }}
             />
             <div className="relative">
-              <img src="/image/search.png" width={15} style={{ position: "absolute", left: "35px", top: " -20px" }} />
+              <img src="/image/search.png" width={15} height={25} style={{ position: "absolute", left: "35px", top: " -20px" }} />
             </div>
           </div>
         </div>

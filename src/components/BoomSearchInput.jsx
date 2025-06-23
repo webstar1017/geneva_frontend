@@ -63,7 +63,7 @@ function BoomSearchInput({
                     className="absolute inset-y-0 flex pointer-events-none self-start mt-3"
                     style={{ left: `${iconOffset}px` }}
                 >
-                    <img src="/image/search.png" alt="logo" className="w-[20] ml-auto" />
+                    <img src="/image/search.png" alt="logo" className="w-[20] h-[20] ml-auto" />
                 </div>
                 <Textarea
                     ref={inputRef}
