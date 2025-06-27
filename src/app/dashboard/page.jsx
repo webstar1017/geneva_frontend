@@ -11,6 +11,7 @@ const Dashboard = () => {
   const fingerprint = useFingerprint();
   const [verified, setVerified] = useState(true);
   const [isClient, setIsClient] = useState(false);
+  const [email, setEmail] = useState("");
   useEffect(() => {
     const auth = async () => {
       if (!fingerprint) return;
@@ -18,6 +19,8 @@ const Dashboard = () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/check-access?device_id=${fingerprint}`);
         if (res.ok) {
+          const data = await res.json(); // Parse JSON response
+          setEmail(data.email);
           setVerified(true)
         } else {
           router.push("/login");
@@ -31,7 +34,7 @@ const Dashboard = () => {
     setIsClient(true);
   }, [fingerprint])
   return (
-    isClient && verified && <LLMAggregator/>
+    isClient && verified && <LLMAggregator email={email}/>
   )
 }
 

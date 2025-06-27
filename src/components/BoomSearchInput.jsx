@@ -16,6 +16,7 @@ function BoomSearchInput({
     useEffect(() => {
         setQuery(defaultQuery);
     }, [defaultQuery])
+
     useEffect(() => {
         if (inputRef.current) {
             let space = 30;

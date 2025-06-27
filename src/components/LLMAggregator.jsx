@@ -18,7 +18,10 @@ import Playground from "./Playground";
 import LLMTitleSearch from "./LLMTitleSearch";
 import toast from "react-hot-toast";
 
-export function LLMAggregator() {
+
+export function LLMAggregator({
+    email
+                              }) {
   const themes = [
     "dark",
     "light",
@@ -38,15 +41,22 @@ export function LLMAggregator() {
   const isMobile = useIsMobile();
   const [search, setSearch] = useState("");
   const scrollRef = useRef(null);
-
+  const [showPayments, setShowPayments] = useState(false);
+  const [transactions, setTransactions]= useState({transactions: [], valid_dater: new Date()});
+    const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
 
   const askQuestion = (query) => {
     let chat_id = localStorage.getItem('chat_id');
     const question = query;
     const history = filterList;
     const textarea = inputRef.current;
-    textarea.style.height = 'auto';        // Reset height
-    textarea.style.height = '44px';
+    if (textarea) {
+      textarea.style.height = 'auto';        // Reset height
+      textarea.style.height = '44px';
+    }
     setWaitingAnswer(true);
 
     abortControllerRef.current = new AbortController();
@@ -75,6 +85,15 @@ export function LLMAggregator() {
     }).then((response) => {
       setWaitingAnswer(false);
       if (!response) return;
+      if (response.level.includes('subscribe')) {
+        setFilterList((prevList) => [...prevList, {
+          user_id: fingerprint,
+          type: 'subscribe',
+          chat_id: chat_id,
+        }]);
+        return;
+      }
+
       if (response.level.includes('product')) {
         if (response.level == 'compare_product') {
           const final_answer = JSON.parse(response.answer);
@@ -159,15 +178,35 @@ export function LLMAggregator() {
           text: question
         }]);
       }
-
     }).catch((error) => {
       console.error(error);
       setWaitingAnswer(false);
     });
   }
+  const getDateString = (iso_date) => {
+      const formattedDate = new Date(iso_date).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+      });
+      return formattedDate;
+  }
+  const getOffsetDate = (iso_date) => {
+// Your valid date (from server)
+      const text = "";
+      const validDate = new Date(iso_date);
+      const currentDate = new Date();
+      const timeDifference = validDate - currentDate;
+      const remainingDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
 
-
-
+      if (remainingDays > 0) {
+          return `Remaining: ${remainingDays} day(s)`;
+      } else if (remainingDays === 0) {
+          return 'Today is the last day';
+      } else {
+          return "You were limitted";
+      }
+  }
   const changeTheme = () => {
     // setTheme(theme === 'dark' ? 'light' : 'dark')
     const themeIndex = themes.findIndex(item => item === theme);
@@ -266,6 +305,7 @@ export function LLMAggregator() {
   }
 
   const changeChatId = (id) => {
+    setShowPayments(false);
     const filteredList = chatHistory
       .filter(chat => chat.chat_id == id)
       .map(chat => ({
@@ -284,8 +324,11 @@ export function LLMAggregator() {
   const addNewChatId = () => {
     setFilterList([]);
     const textarea = inputRef.current;
-    textarea.style.height = 'auto';        // Reset height
-    textarea.style.height = '44px';
+    if(textarea) {
+      textarea.style.height = 'auto';        // Reset height
+      textarea.style.height = '44px';
+    }
+    setShowPayments(false);
     localStorage.removeItem('chat_id');
   }
 
@@ -332,6 +375,29 @@ export function LLMAggregator() {
     waitingRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [filterList])
 
+  useEffect(() => {
+      if(showPayments) {
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/transaction-history`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user_id: fingerprint})
+        }).then((response) => {
+          if (!response.ok) {
+            return false;
+          }
+          return response.json();
+        }).then((response) => {
+          if(response.transactions) {
+            setTransactions(response);
+          }
+        }).catch((error) => {
+          console.error(error);
+        })
+      }
+  }, [showPayments])
+
   return (
     <div className="flex h-screen font-goudy">
       {!hideSideBar && (
@@ -365,6 +431,7 @@ export function LLMAggregator() {
             <span className="text-2xl font-semibold">Geneva</span>
           </div>
           <img src="/image/editor.svg" alt="x" className="w-[24] cursor-pointer" onClick={addNewChatId} />
+          <img src="/image/payments.png" alt="x" className="w-[50] cursor-pointer" onClick={() => setShowPayments(true)} />
           <img src="/image/llm-icons.png" alt="x" className="w-[80%] cursor-pointer" onClick={addNewChatId} />
           
           <div align="center">
@@ -489,15 +556,60 @@ export function LLMAggregator() {
             className="w-[40] h-auto scale-x-[-1] cursor-pointer"
           />
         </header>
-        <Playground
-          theme={theme}
-          filterList={filterList}
-          waitingAnswer={waitingAnswer}
-          setFilterList={setFilterList}
-          inputRef={inputRef}
-          askQuestion={askQuestion}
-          waitingRef={waitingRef}
-        />
+        {
+          showPayments ?
+              <div className="flex flex-col items-center justify-center">
+
+                <div className="mx-auto flex flex-col flex-1 md:max-w-6xl text-black my-4 w-full">
+                  <div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px] mt-[50px]">
+                    <div className="font-bold text-[25px] text-blue-300" align={"right"}>
+                      {
+                        getOffsetDate(transactions.valid_date)
+                      }
+                    </div>
+                      <table width="100%" className={"mt-[20px]"}>
+                        <thead>
+                          <tr className="text-[25px] border-b border-black">
+                            <th width="20%" align={"center"}>
+                              Date
+                            </th>
+                            <th width="20%" align={"center"}>
+                              Status
+                            </th>
+                            <th width="50%" align={"center"}>
+                              Access Key Linked
+                            </th>
+                            <th width="10%" align={"right"}>
+                              Amount
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {
+                          transactions["transactions"].map((item, index) =>
+                            <tr key={index} className="pb-2 pt-2">
+                              <td align={"center"}>{getDateString(item.created_at)}</td>
+                              <td className="text-[20px] font-500" align="center">{item.status}</td>
+                              <td className="text-[20px] font-500" align="center">{item.access_key}</td>
+                              <td className="text-[23px] font-500" align="center">${item.amount}</td>
+                            </tr>
+                          )
+                        }
+                        </tbody>
+                      </table>
+                  </div>
+                </div>
+              </div>:
+              <Playground email={email}
+                theme={theme}
+                filterList={filterList}
+                waitingAnswer={waitingAnswer}
+                setFilterList={setFilterList}
+                inputRef={inputRef}
+                askQuestion={askQuestion}
+                waitingRef={waitingRef}
+              />
+        }
       </div>
     </div>
   );

@@ -3,7 +3,8 @@ import { useState } from "react";
 import toast from 'react-hot-toast';
 import TextInput from "./TextInput";
 import {useRouter} from "next/navigation";
-
+import Subscribe from "@/components/Subscribe";
+import {  CrossmintProvider, CrossmintCheckoutProvider } from "@crossmint/client-sdk-react-ui";
 function Playground({
     filterList,
     setFilterList,
@@ -11,28 +12,13 @@ function Playground({
     theme,
     askQuestion,
     inputRef,
-    waitingRef
+    waitingRef,
+    email
 }) {
+
     const [query, setQuery] = useState('');
     const router = useRouter();
-    const handleKeyDown = (e) => {
-        if (e.key === 'Enter') {
-            if (e.shiftKey) {
-                console.log('Shift + Enter pressed');
-            } else {
-                e.preventDefault();
-                askQuestion(query);
-                setQuery('');
-            }
-        }
-    };
-    // Function to handle the auto resizing of the textarea
-    const handleInputChange = (e) => {
-        setQuery(e.target.value);
-        const textarea = e.target;
-        textarea.style.height = 'auto'; // Reset height before recalculating
-        textarea.style.height = `${textarea.scrollHeight}px`; // Set height based on content
-    };
+
     const copyAnswer = async (text) => {
         try {
             await navigator.clipboard.writeText(text);
@@ -312,6 +298,15 @@ function Playground({
                             </div>
                         </div>
                     )
+                } else if (item.type == "subscribe") {
+                    return <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4"><div className="mx-4 px-4 py-4 shadow-[10px_-10px_black] bg-[#FEFBF0] rounded-[30px]">
+                        <CrossmintProvider apiKey={process.env.NEXT_PUBLIC_CROSSMINT_API_KEY}>
+                            <CrossmintCheckoutProvider>
+                                <Subscribe key={index} email={email}/>
+                            </CrossmintCheckoutProvider>
+                        </CrossmintProvider>
+                    </div>
+                    </div>
                 } else {
                     return (
                         <div key={index} className="mx-auto flex flex-col flex-1 md:max-w-3xl text-black my-4">
@@ -366,7 +361,6 @@ function Playground({
                     )
                 }
             })}
-
             {waitingAnswer && <div ref={waitingRef} className="mx-auto flex flex-col flex-1 md:max-w-3xl my-4">
                 <div className="mx-4 py-4 flex text-2xl">
                     <img src="/image/logo.png" alt="logo" className="w-[30] mr-2" />
@@ -411,7 +405,6 @@ function Playground({
                 `}</style>
                 </div>
             </div>}
-
         </div>
         <div className={`flex mx-auto px-3 md:px-4 w-full pb-6 ${filterList.length ? '' : 'flex-1'}`}>
             <div
